@@ -1,26 +1,27 @@
 import { useState } from "react";
-import {
-  AppBar,
-  Container,
-  Toolbar,
-  Typography,
-  Box,
-  IconButton,
-  MenuItem,
-  Menu,
-  Button,
-} from "@mui/material";
-import LockIcon from "@mui/icons-material/Lock";
+
+import AppBar from "@mui/material/AppBar";
+import Box from "@mui/material/Box";
+import Button from "@mui/material/Button";
+import Toolbar from "@mui/material/Toolbar";
+import Typography from "@mui/material/Typography";
+import IconButton from "@mui/material/IconButton";
 import MenuIcon from "@mui/icons-material/Menu";
+import MenuItem from "@mui/material/MenuItem";
+import Menu from "@mui/material/Menu";
+import Container from "@mui/material/Container";
 import { Link as RouterLink } from "react-router-dom";
+import UserProfileMenu from "./UserProfileMenu";
+import { useAuthState } from "../auth/auth";
+import LockIcon from "@mui/icons-material/Lock";
 
 const pages = [
-  { title: "Home", path: "/" },
-  { title: "Login", path: "/login" },
+  { title: "Home", path: "/" }
 ];
 
-function Navbar() {
+const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
+  const authState = useAuthState();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -52,7 +53,6 @@ function Navbar() {
           >
             AUTH
           </Typography>
-
           <Box sx={{ flexGrow: 1, display: { xs: "flex", md: "none" } }}>
             <IconButton
               size="large"
@@ -127,9 +127,22 @@ function Navbar() {
               </Button>
             ))}
           </Box>
+          {authState.isAuthenticated ? (
+            <UserProfileMenu />
+          ) : (
+            <Button
+              key="login"
+              sx={{ my: 2, color: "white", display: "block" }}
+              component={RouterLink}
+              to="/login"
+            >
+              Login
+            </Button>
+          )}
         </Toolbar>
       </Container>
     </AppBar>
   );
-}
+};
+
 export default Navbar;
