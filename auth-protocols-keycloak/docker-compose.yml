@@ -25,6 +25,8 @@ services:
     ports:
       - '8080:8080'
     command:
-      - start-dev
+      - start-dev --import-realm
     depends_on:
       - postgres
+    volumes:
+      - "./keycloak:/opt/keycloak/data/import"
