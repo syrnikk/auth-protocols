@@ -8,3 +8,11 @@ spring:
         jwt:
           issuer-uri: http://auth-protocols-keycloak:8080/realms/auth-protocols
           jwk-set-uri: http://auth-protocols-keycloak:8080/realms/auth-protocols/protocol/openid-connect/certs
+    saml2:
+      relyingparty:
+        registration:
+          keycloak:
+            assertingparty:
+              metadata-uri: http://auth-protocols-keycloak:8080/realms/auth-protocols/protocol/saml/descriptor
+              singlesignon:
+                sign-request: false
