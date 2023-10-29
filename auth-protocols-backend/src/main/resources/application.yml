@@ -15,4 +15,14 @@ spring:
             assertingparty:
               metadata-uri: http://auth-protocols-keycloak:8080/realms/auth-protocols/protocol/saml/descriptor
               singlesignon:
-                sign-request: false
+                binding: POST
+            signing:
+              credentials:
+                - certificate-location: classpath:saml/local.crt
+                  private-key-location: classpath:saml/local.key
+            singlelogout:
+              binding: POST
+
+app:
+  saml:
+    success-url: http://localhost:5173

@@ -1,5 +1,6 @@
 package com.syrnik.authprotocolsbackend.config;
 
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.Customizer;
@@ -15,6 +16,10 @@ import com.syrnik.authprotocolsbackend.security.oidc.JwtAuthConverter;
 @EnableWebSecurity
 @EnableMethodSecurity
 public class SecurityConfiguration {
+
+    @Value("${app.saml.success-url}")
+    private String samlSuccessUrl;
+
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         return http
@@ -22,12 +27,11 @@ public class SecurityConfiguration {
               .authorizeHttpRequests(
                     auth -> auth
                           .requestMatchers("/api/public/**").permitAll()
-                          .requestMatchers("/login/**").permitAll()
                           .anyRequest().authenticated())
               .oauth2ResourceServer(oauth2 -> oauth2.jwt(
                     jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(new JwtAuthConverter())))
-              .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
-              .saml2Login(Customizer.withDefaults())
+              .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
+              .saml2Login(saml2Login -> saml2Login.defaultSuccessUrl(samlSuccessUrl))
               .saml2Logout(Customizer.withDefaults())
               .build();
     }
