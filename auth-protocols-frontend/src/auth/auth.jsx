@@ -53,6 +53,9 @@ function reducer(state, action) {
     if(action.protocol === AuthProtocol.OIDC) {
       return {...state, protocol: AuthProtocol.OIDC, isAuthenticated: true}
     }
+    if(action.protocol === AuthAction.SAML) {
+      return {...state, protocol: AuthProtocol.SAML, isAuthenticated: true}
+    }
   }
   if(action.type === AuthAction.LOGOUT) {
     return {...initialState};

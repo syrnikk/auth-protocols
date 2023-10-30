@@ -1,4 +1,5 @@
 import { AuthProvider } from "react-oidc-context";
+import config from "../config/config";
 
 const onSigninCallback = () => {
   window.history.replaceState({}, document.title, window.location.pathname);
@@ -7,9 +8,10 @@ const onSigninCallback = () => {
 const url = window.location.origin;
 
 const oidcConfig = {
-  authority: "http://auth-protocols-keycloak:8080/realms/auth-protocols",
-  client_id: "auth-protocols-client-oidc",
-  redirect_uri: url,
+  authority: config.OIDC_AUTHORITY,
+  client_id: config.OIDC_CLIENT_ID,
+  redirect_uri: config.OIDC_REDIRECT_URI || url,
+  post_logout_redirect_uri: config.OIDC_POST_LOGOUT_REDIRECT_URI || url,
   onSigninCallback: onSigninCallback
 };
 

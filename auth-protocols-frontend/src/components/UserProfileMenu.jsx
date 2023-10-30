@@ -31,6 +31,7 @@ const UserProfileMenu = () => {
     if (authState.protocol === AuthProtocol.OIDC) {
       console.log(authState);
       oidc.removeUser();
+      oidc.signoutRedirect();
     }
 
     authDispatch({ type: AuthAction.LOGOUT });
