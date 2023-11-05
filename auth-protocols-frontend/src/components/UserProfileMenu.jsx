@@ -5,13 +5,15 @@ import {
   useAuthDispatch,
   useAuthState,
 } from "../auth/auth";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
+import config from "../config/config";
 
 const UserProfileMenu = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const samlLogoutFormRef = useRef();
 
   const navigate = useNavigate();
 
@@ -29,13 +31,18 @@ const UserProfileMenu = () => {
 
   const logout = () => {
     if (authState.protocol === AuthProtocol.OIDC) {
-      console.log(authState);
       oidc.removeUser();
       oidc.signoutRedirect();
     }
 
+    if (authState.protocol === AuthProtocol.SAML2) {
+      const form = samlLogoutFormRef.current;
+      if (form) {
+        form.submit();
+      }
+    }
+
     authDispatch({ type: AuthAction.LOGOUT });
-    console.log;
     navigate("/");
   };
 
@@ -69,6 +76,11 @@ const UserProfileMenu = () => {
         <MenuItem onClick={handleClose}>Profile</MenuItem>
         <MenuItem onClick={handleClose}>My account</MenuItem>
         <MenuItem onClick={logout}>Log out</MenuItem>
+        <form
+          ref={samlLogoutFormRef}
+          action={config.LOGOUT_URI}
+          method="post"
+        />
       </Menu>
     </div>
   );

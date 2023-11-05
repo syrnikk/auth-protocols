@@ -10,6 +10,8 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.SecurityFilterChain;
+import com.syrnik.authprotocolsbackend.security.CustomAuthenticationEntryPoint;
+import com.syrnik.authprotocolsbackend.security.CustomLogoutSuccessHandler;
 import com.syrnik.authprotocolsbackend.security.oidc.JwtAuthConverter;
 
 @Configuration
@@ -19,6 +21,9 @@ public class SecurityConfiguration {
 
     @Value("${app.saml.success-url}")
     private String samlSuccessUrl;
+
+    @Value("${app.logout.success-url}")
+    private String logoutSuccessUrl;
 
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
@@ -33,6 +38,8 @@ public class SecurityConfiguration {
               .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.IF_REQUIRED))
               .saml2Login(saml2Login -> saml2Login.defaultSuccessUrl(samlSuccessUrl))
               .saml2Logout(Customizer.withDefaults())
+              .logout(logout -> logout.logoutSuccessHandler(new CustomLogoutSuccessHandler(logoutSuccessUrl)))
+              .exceptionHandling(exception -> exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
               .build();
     }
 }

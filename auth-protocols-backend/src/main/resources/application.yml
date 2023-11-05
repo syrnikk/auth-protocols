@@ -6,14 +6,14 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://auth-protocols-keycloak:8080/realms/auth-protocols
-          jwk-set-uri: http://auth-protocols-keycloak:8080/realms/auth-protocols/protocol/openid-connect/certs
+          issuer-uri: http://auth-protocols-keycloak:8080/realms/auth-protocols-oidc
+          jwk-set-uri: http://auth-protocols-keycloak:8080/realms/auth-protocols-oidc/protocol/openid-connect/certs
     saml2:
       relyingparty:
         registration:
           keycloak:
             assertingparty:
-              metadata-uri: http://auth-protocols-keycloak:8080/realms/auth-protocols/protocol/saml/descriptor
+              metadata-uri: http://auth-protocols-keycloak:8080/realms/auth-protocols-saml2/protocol/saml/descriptor
               singlesignon:
                 binding: POST
             signing:
@@ -22,7 +22,10 @@ spring:
                   private-key-location: classpath:saml/local.key
             singlelogout:
               binding: POST
+              response-url: "{baseUrl}/logout/saml2/slo"
 
 app:
+  logout:
+    success-url: http://localhost:5173
   saml:
     success-url: http://localhost:5173

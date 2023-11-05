@@ -3,7 +3,7 @@ import OidcProvider from "./oidc";
 
 const AuthProtocol = {
   OIDC: "OIDC",
-  SAML: "SAML",
+  SAML2: "SAML2",
   LDAP: "LDAP",
   KERBEROS: "KERBEROS",
 };
@@ -53,8 +53,8 @@ function reducer(state, action) {
     if(action.protocol === AuthProtocol.OIDC) {
       return {...state, protocol: AuthProtocol.OIDC, isAuthenticated: true}
     }
-    if(action.protocol === AuthAction.SAML) {
-      return {...state, protocol: AuthProtocol.SAML, isAuthenticated: true}
+    if(action.protocol === AuthProtocol.SAML2) {
+      return {...state, protocol: AuthProtocol.SAML2, isAuthenticated: true}
     }
   }
   if(action.type === AuthAction.LOGOUT) {

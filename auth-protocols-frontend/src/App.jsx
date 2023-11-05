@@ -5,6 +5,7 @@ import Login from "./pages/Login";
 import { useAuth } from "react-oidc-context";
 import { AuthAction, AuthProtocol, useAuthDispatch } from "./auth/auth";
 import { useEffect } from "react";
+import axiosInstance from "./axios/axiosInstance";
 
 function App() {
   const authDispatch = useAuthDispatch();
@@ -15,6 +16,22 @@ function App() {
       authDispatch({ type: AuthAction.LOGIN, protocol: AuthProtocol.OIDC });
     }
   }, [oidc.isAuthenticated]);
+
+  useEffect(() => {
+    async function fetchData() {
+      try {
+        const response = await axiosInstance.get("/api/auth/me");
+        authDispatch({
+          type: AuthAction.LOGIN,
+          protocol: response.data.protocol,
+        });
+      } catch (error) {
+        console.log(error);
+      }
+    }
+
+    fetchData();
+  }, []);
 
   switch (oidc.activeNavigator) {
     case "signinSilent":

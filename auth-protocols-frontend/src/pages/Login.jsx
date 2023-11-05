@@ -10,14 +10,14 @@ import { useRef } from "react";
 
 const Login = () => {
   const oidc = useAuth();
-  const samlFormRef = useRef();
+  const samlLoginFormRef = useRef();
 
   const oidcLogin = () => {
     oidc.signinRedirect();
   };
 
   const samlLogin = () => {
-    const form = samlFormRef.current;
+    const form = samlLoginFormRef.current;
     if (form) {
       form.submit();
     }
@@ -52,14 +52,14 @@ const Login = () => {
         </Grid>
         <Grid item>
           <AuthCard imageSrc={samlLogo} text="SAML 2.0" onClick={samlLogin} />
-        </Grid>
-        <Grid item>
-          <AuthCard imageSrc={ldapLogo} text="LDAP" />
           <form
-            ref={samlFormRef}
+            ref={samlLoginFormRef}
             action={config.SAML_AUTHENTICATION_REQUEST_URI}
             method="post"
           />
+        </Grid>
+        <Grid item>
+          <AuthCard imageSrc={ldapLogo} text="LDAP" />
         </Grid>
         <Grid item>
           <AuthCard imageSrc={kerberosLogo} text="Kerberos" />
