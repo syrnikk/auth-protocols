@@ -7,8 +7,9 @@ import { Grid, Box, Typography } from "@mui/material";
 import { useAuth } from "react-oidc-context";
 import config from "../config/config";
 import { useRef } from "react";
+import Loading from "./Loading";
 
-const Login = () => {
+const Login = ({ onShowLoading }) => {
   const oidc = useAuth();
   const samlLoginFormRef = useRef();
 
@@ -20,6 +21,7 @@ const Login = () => {
     const form = samlLoginFormRef.current;
     if (form) {
       form.submit();
+      onShowLoading();
     }
   };
 

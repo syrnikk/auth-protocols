@@ -4,10 +4,13 @@ import Home from "./pages/Home";
 import Login from "./pages/Login";
 import { useAuth } from "react-oidc-context";
 import { AuthAction, AuthProtocol, useAuthDispatch } from "./auth/auth";
-import { useEffect } from "react";
+import { useEffect, useState } from "react";
 import axiosInstance from "./axios/axiosInstance";
+import Loading from "./pages/Loading";
+import Error from "./pages/Error";
 
 function App() {
+  const [isLoading, setIsLoading] = useState(false);
   const authDispatch = useAuthDispatch();
   const oidc = useAuth();
 
@@ -33,19 +36,23 @@ function App() {
     fetchData();
   }, []);
 
+  const showLoading = () => {
+    setIsLoading(true);
+  };
+
   switch (oidc.activeNavigator) {
     case "signinSilent":
-      return <div>Signing you in...</div>;
+      return <Loading title="Signing you in..." />;
     case "signoutRedirect":
-      return <div>Signing you out...</div>;
+      return <Loading title="Signing you out..." />;
   }
 
-  if (oidc.isLoading) {
-    return <div>Loading...</div>;
+  if (isLoading || oidc.isLoading) {
+    return <Loading title="Loading..." />;
   }
 
   if (oidc.error) {
-    return <div>Oops... {oidc.error.message}</div>;
+    return <Error errorMessage={`Oops... ${oidc.error.message}`} />;
   }
 
   return (
@@ -54,7 +61,10 @@ function App() {
         <Navbar />
         <Routes>
           <Route index element={<Home />} />
-          <Route path="/login" element={<Login />} />
+          <Route
+            path="/login"
+            element={<Login onShowLoading={showLoading} />}
+          />
         </Routes>
       </BrowserRouter>
     </>
