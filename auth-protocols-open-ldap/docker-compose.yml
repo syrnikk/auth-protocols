@@ -1,0 +1,28 @@
+version: '3'
+
+services:
+
+  openldap:
+    image: osixia/openldap:${LDAP_VERSION}
+    environment:
+      LDAP_ORGANISATION: ${LDAP_ORGANISATION}
+      LDAP_DOMAIN: ${LDAP_DOMAIN}
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+      LDAP_BASE_DN: ${LDAP_BASE_DN}
+    ports:
+      - "389:389"
+    volumes:
+      - ./data:/var/lib/ldap
+      - ./config:/etc/ldap/slapd.d
+      - ./initial:/initial
+    command: [ "/bin/bash", "/initial/ldap-init.sh" ]
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:${PHPLDAPADMIN_VERSION}
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: openldap
+      PHPLDAPADMIN_HTTPS: 'false'
+    ports:
+      - "80:80"
+    depends_on:
+      - openldap
