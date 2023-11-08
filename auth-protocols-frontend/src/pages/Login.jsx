@@ -1,73 +1,93 @@
-import AuthCard from "../components/AuthCard";
-import oidcLogo from "/oidc-logo.png";
-import samlLogo from "/saml-logo.png";
-import ldapLogo from "/ldap-logo.png";
-import kerberosLogo from "/kerberos-logo.png";
-import { Grid, Box, Typography } from "@mui/material";
-import { useAuth } from "react-oidc-context";
-import config from "../config/config";
-import { useRef } from "react";
-import Loading from "./Loading";
+import Button from "@mui/material/Button";
+import TextField from "@mui/material/TextField";
+import FormControlLabel from "@mui/material/FormControlLabel";
+import Checkbox from "@mui/material/Checkbox";
+import Link from "@mui/material/Link";
+import Grid from "@mui/material/Grid";
+import Box from "@mui/material/Box";
+import Typography from "@mui/material/Typography";
+import Container from "@mui/material/Container";
+import axiosInstance from "../axios/axiosInstance";
+import { AuthAction, useAuthDispatch } from "../auth/auth";
+import { useNavigate } from "react-router-dom";
 
-const Login = ({ onShowLoading }) => {
-  const oidc = useAuth();
-  const samlLoginFormRef = useRef();
+const Login = () => {
+  const authDispatch = useAuthDispatch();
+  const navigate = useNavigate();
 
-  const oidcLogin = () => {
-    oidc.signinRedirect();
-  };
-
-  const samlLogin = () => {
-    const form = samlLoginFormRef.current;
-    if (form) {
-      form.submit();
-      onShowLoading();
+  const handleSubmit = async (event) => {
+    event.preventDefault();
+    const data = new FormData(event.currentTarget);
+    try {
+      await axiosInstance.post("/api/login", data);
+      const authResponse = await axiosInstance.get("/api/auth/me");
+      authDispatch({
+        type: AuthAction.LOGIN,
+        protocol: authResponse.data.protocol,
+      });
+    } catch (error) {
+      console.log(error);
     }
+    navigate("/");
   };
 
   return (
-    <Box
-      sx={{
-        padding: 5,
-        display: "flex",
-        flexDirection: "column",
-        justifyContent: "center",
-        alignItems: "center",
-      }}
-    >
-      <Typography variant="h3" sx={{ paddingBottom: 4 }}>
-        Login with:
-      </Typography>
-      <Grid
-        container
-        justifyContent="center"
-        alignItems="center"
-        spacing={2}
-        maxWidth={720}
+    <Container component="main" maxWidth="xs">
+      <Box
+        sx={{
+          marginTop: 8,
+          display: "flex",
+          flexDirection: "column",
+          alignItems: "center",
+        }}
       >
-        <Grid item>
-          <AuthCard
-            imageSrc={oidcLogo}
-            text="Open ID Connect"
-            onClick={oidcLogin}
+        <Typography component="h1" variant="h5">
+          Sign in
+        </Typography>
+        <Box component="form" onSubmit={handleSubmit} noValidate sx={{ mt: 1 }}>
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            id="username"
+            label="Username"
+            name="username"
+            autoComplete="username"
+            autoFocus
           />
-        </Grid>
-        <Grid item>
-          <AuthCard imageSrc={samlLogo} text="SAML 2.0" onClick={samlLogin} />
-          <form
-            ref={samlLoginFormRef}
-            action={config.SAML_AUTHENTICATION_REQUEST_URI}
-            method="post"
+          <TextField
+            margin="normal"
+            required
+            fullWidth
+            name="password"
+            label="Password"
+            type="password"
+            id="password"
+            autoComplete="current-password"
           />
-        </Grid>
-        <Grid item>
-          <AuthCard imageSrc={ldapLogo} text="LDAP" />
-        </Grid>
-        <Grid item>
-          <AuthCard imageSrc={kerberosLogo} text="Kerberos" />
-        </Grid>
-      </Grid>
-    </Box>
+          <Button
+            type="submit"
+            fullWidth
+            variant="contained"
+            sx={{ mt: 3, mb: 2 }}
+          >
+            Sign In
+          </Button>
+          <Grid container>
+            <Grid item xs>
+              <Link href="#" variant="body2">
+                Forgot password?
+              </Link>
+            </Grid>
+            <Grid item>
+              <Link href="#" variant="body2">
+                {"Don't have an account? Sign Up"}
+              </Link>
+            </Grid>
+          </Grid>
+        </Box>
+      </Box>
+    </Container>
   );
 };
 

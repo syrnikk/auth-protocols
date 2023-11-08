@@ -23,6 +23,11 @@ spring:
             singlelogout:
               binding: POST
               response-url: "{baseUrl}/logout/saml2/slo"
+  ldap:
+    urls: ldap://localhost:389
+    base: dc=auth-protocols,dc=com
+    username: cn=admin,dc=auth-protocols,dc=com
+    password: adminpassword
 
 app:
   logout:

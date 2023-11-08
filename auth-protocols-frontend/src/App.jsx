@@ -1,13 +1,14 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
 import Home from "./pages/Home";
-import Login from "./pages/Login";
+import LoginWith from "./pages/LoginWith";
 import { useAuth } from "react-oidc-context";
 import { AuthAction, AuthProtocol, useAuthDispatch } from "./auth/auth";
 import { useEffect, useState } from "react";
 import axiosInstance from "./axios/axiosInstance";
 import Loading from "./pages/Loading";
 import Error from "./pages/Error";
+import Login from "./pages/Login";
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
@@ -62,9 +63,10 @@ function App() {
         <Routes>
           <Route index element={<Home />} />
           <Route
-            path="/login"
-            element={<Login onShowLoading={showLoading} />}
+            path="/login-with"
+            element={<LoginWith onShowLoading={showLoading} />}
           />
+          <Route path="/login" element={<Login />} />
         </Routes>
       </BrowserRouter>
     </>

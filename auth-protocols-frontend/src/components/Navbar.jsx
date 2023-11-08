@@ -134,7 +134,7 @@ const Navbar = () => {
               key="login"
               sx={{ my: 2, color: "white", display: "block" }}
               component={RouterLink}
-              to="/login"
+              to="/login-with"
             >
               Login
             </Button>

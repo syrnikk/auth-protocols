@@ -56,6 +56,9 @@ function reducer(state, action) {
     if(action.protocol === AuthProtocol.SAML2) {
       return {...state, protocol: AuthProtocol.SAML2, isAuthenticated: true}
     }
+    if(action.protocol === AuthProtocol.LDAP) {
+      return {...state, protocol: AuthProtocol.LDAP, isAuthenticated: true}
+    }
   }
   if(action.type === AuthAction.LOGOUT) {
     return {...initialState};

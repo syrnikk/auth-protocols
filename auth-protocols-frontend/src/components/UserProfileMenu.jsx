@@ -10,6 +10,7 @@ import { IconButton, Menu, MenuItem } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import config from "../config/config";
+import axiosInstance from "../axios/axiosInstance";
 
 const UserProfileMenu = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -40,6 +41,10 @@ const UserProfileMenu = () => {
       if (form) {
         form.submit();
       }
+    }
+
+    if (authState.protocol === AuthProtocol.LDAP) {
+      axiosInstance.post(config.LDAP_LOGOUT_URI);
     }
 
     authDispatch({ type: AuthAction.LOGOUT });
@@ -78,7 +83,7 @@ const UserProfileMenu = () => {
         <MenuItem onClick={logout}>Log out</MenuItem>
         <form
           ref={samlLogoutFormRef}
-          action={config.LOGOUT_URI}
+          action={config.SAML_LOGOUT_URI}
           method="post"
         />
       </Menu>
