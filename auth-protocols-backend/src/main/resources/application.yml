@@ -34,3 +34,11 @@ app:
     success-url: http://localhost:5173
   saml:
     success-url: http://localhost:5173
+
+jwt:
+  access-token:
+    secret: FDTSiQPw7hmwLufNzQ4zReJqqOhSCO6OHcVYPKRs1IjDLCWCVusspwiBsvAfSGbtSvxYTA6YsF11e5VI2RDJxw==
+    validity: 5
+  refresh-token:
+    secret: P2Ppuv+578KztxHkSd//OwfPgU/f5hF3+taxPOqR+DtLqGc01lI7xzDiq+j/dQXmBwduM6cjQS5nwMtIMR6iDg==
+    validity: 30
