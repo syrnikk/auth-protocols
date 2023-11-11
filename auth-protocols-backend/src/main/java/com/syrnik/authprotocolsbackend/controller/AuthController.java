@@ -1,5 +1,8 @@
 package com.syrnik.authprotocolsbackend.controller;
 
+import static com.syrnik.authprotocolsbackend.constant.JwtClaims.AUTHORITIES;
+import static com.syrnik.authprotocolsbackend.constant.JwtClaims.PROTOCOL;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.Authentication;
@@ -13,6 +16,7 @@ import com.syrnik.authprotocolsbackend.dto.AuthDto;
 import com.syrnik.authprotocolsbackend.dto.JwtResponse;
 import com.syrnik.authprotocolsbackend.dto.RefreshTokenRequest;
 import com.syrnik.authprotocolsbackend.enums.AuthProtocol;
+import com.syrnik.authprotocolsbackend.security.jwt.JwtTokenClaims;
 import com.syrnik.authprotocolsbackend.security.jwt.JwtTokenProvider;
 
 import io.jsonwebtoken.Claims;
@@ -38,10 +42,10 @@ public class AuthController {
         String refreshToken = refreshTokenRequest.refreshToken();
         if(jwtTokenProvider.validateRefreshToken(refreshToken)) {
             Claims claims = jwtTokenProvider.extractRefreshTokenClaims(refreshToken);
-            String newAccessToken = jwtTokenProvider.generateAccessToken(claims.getSubject(),
-                  claims.get("authorities"));
-            String newRefreshToken = jwtTokenProvider.generateRefreshToken(claims.getSubject(),
-                  claims.get("authorities"));
+            JwtTokenClaims jwtTokenClaims = new JwtTokenClaims(claims.getSubject(), claims.get(AUTHORITIES),
+                  claims.get(PROTOCOL));
+            String newAccessToken = jwtTokenProvider.generateAccessToken(jwtTokenClaims);
+            String newRefreshToken = jwtTokenProvider.generateRefreshToken(jwtTokenClaims);
             return ResponseEntity.ok(new JwtResponse(newAccessToken, newRefreshToken));
         }
         return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();

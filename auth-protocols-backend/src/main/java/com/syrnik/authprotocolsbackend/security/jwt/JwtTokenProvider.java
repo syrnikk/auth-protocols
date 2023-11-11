@@ -1,5 +1,8 @@
 package com.syrnik.authprotocolsbackend.security.jwt;
 
+import static com.syrnik.authprotocolsbackend.constant.JwtClaims.AUTHORITIES;
+import static com.syrnik.authprotocolsbackend.constant.JwtClaims.PROTOCOL;
+
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -32,25 +35,26 @@ public class JwtTokenProvider {
     @Value("${jwt.refresh-token.validity}")
     private Long jwtRefreshTokenValidityInMinutes;
 
-    public String generateAccessToken(String username, Object authorities) {
-        return generateToken(username, authorities, jwtAccessTokenSecret, jwtAccessTokenValidityInMinutes);
+    public String generateAccessToken(JwtTokenClaims jwtTokenClaims) {
+        return generateToken(jwtTokenClaims, jwtAccessTokenSecret, jwtAccessTokenValidityInMinutes);
 
     }
 
-    public String generateRefreshToken(String username, Object authorities) {
-        return generateToken(username, authorities, jwtRefreshTokenSecret, jwtRefreshTokenValidityInMinutes);
+    public String generateRefreshToken(JwtTokenClaims jwtTokenClaims) {
+        return generateToken(jwtTokenClaims, jwtRefreshTokenSecret, jwtRefreshTokenValidityInMinutes);
     }
 
-    private String generateToken(String username, Object authorities, String tokenSecret, Long tokenValidityInMinutes) {
+    private String generateToken(JwtTokenClaims jwtTokenClaims, String tokenSecret, Long tokenValidityInMinutes) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + tokenValidityInMinutes * 60 * 1000);
 
         return Jwts
               .builder()
-              .subject(username)
+              .subject(jwtTokenClaims.username())
               .issuedAt(now)
               .expiration(expiration)
-              .claim("authorities", authorities)
+              .claim(AUTHORITIES, jwtTokenClaims.authorities())
+              .claim(PROTOCOL, jwtTokenClaims.protocol())
               .signWith(SignatureAlgorithm.HS512, tokenSecret)
               .compact();
     }

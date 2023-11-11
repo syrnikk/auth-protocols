@@ -12,7 +12,7 @@ import Menu from "@mui/material/Menu";
 import Container from "@mui/material/Container";
 import { Link as RouterLink } from "react-router-dom";
 import UserProfileMenu from "./UserProfileMenu";
-import { useAuthState } from "../auth/auth";
+import { useGlobalState } from "./GlobalProvider";
 import LockIcon from "@mui/icons-material/Lock";
 
 const pages = [
@@ -21,7 +21,7 @@ const pages = [
 
 const Navbar = () => {
   const [anchorElNav, setAnchorElNav] = useState(null);
-  const authState = useAuthState();
+  const globalState = useGlobalState();
 
   const handleOpenNavMenu = (event) => {
     setAnchorElNav(event.currentTarget);
@@ -127,7 +127,7 @@ const Navbar = () => {
               </Button>
             ))}
           </Box>
-          {authState.isAuthenticated ? (
+          {globalState.isAuthenticated ? (
             <UserProfileMenu />
           ) : (
             <Button

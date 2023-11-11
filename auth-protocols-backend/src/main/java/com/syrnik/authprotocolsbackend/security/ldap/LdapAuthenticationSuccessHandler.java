@@ -8,6 +8,8 @@ import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.syrnik.authprotocolsbackend.dto.JwtResponse;
+import com.syrnik.authprotocolsbackend.enums.AuthProtocol;
+import com.syrnik.authprotocolsbackend.security.jwt.JwtTokenClaims;
 import com.syrnik.authprotocolsbackend.security.jwt.JwtTokenProvider;
 
 import jakarta.servlet.http.HttpServletRequest;
@@ -27,10 +29,10 @@ public class LdapAuthenticationSuccessHandler implements AuthenticationSuccessHa
         String accessToken = null;
         String refreshToken = null;
         if(authentication.getPrincipal() instanceof LdapUserDetails ldapUserDetails) {
-            accessToken = jwtTokenProvider.generateAccessToken(ldapUserDetails.getUsername(),
-                  authentication.getAuthorities());
-            refreshToken = jwtTokenProvider.generateRefreshToken(ldapUserDetails.getUsername(),
-                  authentication.getAuthorities());
+            JwtTokenClaims jwtTokenClaims = new JwtTokenClaims(ldapUserDetails.getUsername(),
+                  authentication.getAuthorities(), AuthProtocol.LDAP);
+            accessToken = jwtTokenProvider.generateAccessToken(jwtTokenClaims);
+            refreshToken = jwtTokenProvider.generateRefreshToken(jwtTokenClaims);
         }
         objectMapper.writeValue(response.getWriter(), new JwtResponse(accessToken, refreshToken));
     }

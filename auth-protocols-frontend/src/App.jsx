@@ -1,40 +1,41 @@
 import { BrowserRouter, Route, Routes } from "react-router-dom";
 import Navbar from "./components/Navbar";
-import Home from "./pages/Home";
-import LoginWith from "./pages/LoginWith";
+import Home from "./components/Home";
+import LoginWith from "./components/LoginWith";
 import { useAuth } from "react-oidc-context";
-import { AuthAction, AuthProtocol, useAuthDispatch } from "./auth/auth";
+import { Action, Protocol, useGlobalDispatch } from "./components/GlobalProvider";
 import { useEffect, useState } from "react";
-import axiosInstance from "./axios/axiosInstance";
-import Loading from "./pages/Loading";
-import Error from "./pages/Error";
-import Login from "./pages/Login";
+import Loading from "./components/Loading";
+import Error from "./components/Error";
+import Login from "./components/Login";
+import { decodeToken } from "react-jwt";
+import api from "./api/api";
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
-  const authDispatch = useAuthDispatch();
+  const globalDispatch = useGlobalDispatch();
   const oidc = useAuth();
 
   useEffect(() => {
     if (oidc.isAuthenticated) {
-      authDispatch({ type: AuthAction.LOGIN, protocol: AuthProtocol.OIDC });
+      globalDispatch({ type: Action.LOGIN, protocol: Protocol.OIDC });
     }
   }, [oidc.isAuthenticated]);
 
   useEffect(() => {
-    async function fetchData() {
-      try {
-        const response = await axiosInstance.get("/api/auth/me");
-        authDispatch({
-          type: AuthAction.LOGIN,
-          protocol: response.data.protocol,
+    const checkAccessToken = () => {
+      const accessToken = localStorage.getItem("accessToken");
+      if (accessToken) {
+        const decodedToken = decodeToken(accessToken);
+        globalDispatch({
+          type: Action.LOGIN,
+          protocol: decodedToken.protocol,
+          user: decodedToken.sub,
         });
-      } catch (error) {
-        console.log(error);
       }
-    }
+    };
 
-    fetchData();
+    checkAccessToken();
   }, []);
 
   const showLoading = () => {

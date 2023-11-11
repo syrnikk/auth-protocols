@@ -1,13 +1,13 @@
 import { Typography } from "@mui/material";
-import { useAuthState } from "../auth/auth";
+import { useGlobalState } from "./GlobalProvider";
 
 const Home = () => {
-  const authState = useAuthState();
+  const globalState = useGlobalState();
 
   return (
     <Typography variant="h2" sx={{ paddingBottom: 4 }}>
-      {authState.isAuthenticated
-        ? `You are logged in with ${authState.protocol}.`
+      {globalState.isAuthenticated
+        ? `You are logged in with ${globalState.protocol}.`
         : "Hello anonymous"}
     </Typography>
   );

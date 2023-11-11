@@ -1,29 +1,32 @@
 import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
-import FormControlLabel from "@mui/material/FormControlLabel";
-import Checkbox from "@mui/material/Checkbox";
 import Link from "@mui/material/Link";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
-import axiosInstance from "../axios/axiosInstance";
-import { AuthAction, useAuthDispatch } from "../auth/auth";
+import api from "../api/api";
+import { Action, Protocol, useGlobalDispatch } from "./GlobalProvider";
 import { useNavigate } from "react-router-dom";
+import { decodeToken } from "react-jwt";
 
 const Login = () => {
-  const authDispatch = useAuthDispatch();
+  const globalDispatch = useGlobalDispatch();
   const navigate = useNavigate();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     try {
-      await axiosInstance.post("/api/login", data);
-      const authResponse = await axiosInstance.get("/api/auth/me");
-      authDispatch({
-        type: AuthAction.LOGIN,
-        protocol: authResponse.data.protocol,
+      const response = await api.post("/api/login", data);
+      const { accessToken, refreshToken } = response.data;
+      localStorage.setItem('accessToken', accessToken);
+      localStorage.setItem('refreshToken', refreshToken);
+      const decodedToken = decodeToken(accessToken);
+      globalDispatch({
+        type: Action.LOGIN,
+        protocol: Protocol.LDAP,
+        user: decodedToken.sub,
       });
     } catch (error) {
       console.log(error);

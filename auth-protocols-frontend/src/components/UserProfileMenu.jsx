@@ -1,16 +1,15 @@
 import { useAuth } from "react-oidc-context";
 import {
-  AuthAction,
-  AuthProtocol,
-  useAuthDispatch,
-  useAuthState,
-} from "../auth/auth";
+  Action,
+  Protocol,
+  useGlobalDispatch,
+  useGlobalState,
+} from "./GlobalProvider";
 import { useRef, useState } from "react";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
 import { useNavigate } from "react-router-dom";
 import config from "../config/config";
-import axiosInstance from "../axios/axiosInstance";
 
 const UserProfileMenu = () => {
   const [anchorEl, setAnchorEl] = useState(null);
@@ -18,8 +17,8 @@ const UserProfileMenu = () => {
 
   const navigate = useNavigate();
 
-  const authState = useAuthState();
-  const authDispatch = useAuthDispatch();
+  const globalState = useGlobalState();
+  const globalDispatch = useGlobalDispatch();
   const oidc = useAuth();
 
   const handleMenu = (event) => {
@@ -31,23 +30,24 @@ const UserProfileMenu = () => {
   };
 
   const logout = () => {
-    if (authState.protocol === AuthProtocol.OIDC) {
+    if (globalState.protocol === Protocol.OIDC) {
       oidc.removeUser();
       oidc.signoutRedirect();
     }
 
-    if (authState.protocol === AuthProtocol.SAML2) {
+    if (globalState.protocol === Protocol.SAML2) {
       const form = samlLogoutFormRef.current;
       if (form) {
         form.submit();
       }
     }
 
-    if (authState.protocol === AuthProtocol.LDAP) {
-      axiosInstance.post(config.LDAP_LOGOUT_URI);
+    if (globalState.protocol === Protocol.LDAP) {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
     }
 
-    authDispatch({ type: AuthAction.LOGOUT });
+    globalDispatch({ type: Action.LOGOUT });
     navigate("/");
   };
 
