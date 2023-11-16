@@ -5,9 +5,9 @@ import ldapLogo from "/ldap-logo.png";
 import kerberosLogo from "/kerberos-logo.png";
 import { Grid, Box, Typography } from "@mui/material";
 import { useAuth } from "react-oidc-context";
-import config from "../config/config";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
+import api from "../api/api";
 
 const LoginWith = ({ onShowLoading }) => {
   const oidc = useAuth();
@@ -18,9 +18,12 @@ const LoginWith = ({ onShowLoading }) => {
     oidc.signinRedirect();
   };
 
-  const samlLogin = () => {
+  const samlLogin = async () => {
+    const response = await api.get('/api/saml2/create');
     const form = samlLoginFormRef.current;
     if (form) {
+      form.action = response.data.samlIdpService;
+      form.querySelector('input[name="SAMLRequest"]').value = response.data.authnRequestEncoded;
       form.submit();
       onShowLoading();
     }
@@ -61,9 +64,9 @@ const LoginWith = ({ onShowLoading }) => {
           <AuthCard imageSrc={samlLogo} text="SAML 2.0" onClick={samlLogin} />
           <form
             ref={samlLoginFormRef}
-            action={config.SAML_AUTHENTICATION_REQUEST_URI}
-            method="post"
-          />
+            method="post">
+            <input type="hidden" name="SAMLRequest" />
+          </form>
         </Grid>
         <Grid item>
           <AuthCard imageSrc={ldapLogo} text="LDAP" onClick={ldapLogin} />

@@ -15,15 +15,15 @@ import org.springframework.security.oauth2.jwt.Jwt;
 import org.springframework.security.oauth2.jwt.JwtClaimNames;
 import org.springframework.security.oauth2.server.resource.authentication.JwtAuthenticationToken;
 import org.springframework.security.oauth2.server.resource.authentication.JwtGrantedAuthoritiesConverter;
-import com.syrnik.authprotocolsbackend.constant.JwtClaims;
+import com.syrnik.authprotocolsbackend.security.jwt.JwtClaims;
 
-public class JwtAuthConverter implements Converter<Jwt, AbstractAuthenticationToken> {
+public class OidcJwtConverter implements Converter<Jwt, AbstractAuthenticationToken> {
 
     private static final String ROLE_PREFIX = "ROLE_";
 
     private final JwtGrantedAuthoritiesConverter jwtGrantedAuthoritiesConverter;
 
-    public JwtAuthConverter() {
+    public OidcJwtConverter() {
         this.jwtGrantedAuthoritiesConverter = new JwtGrantedAuthoritiesConverter();
     }
 

@@ -6,13 +6,14 @@ import Box from "@mui/material/Box";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import api from "../api/api";
-import { Action, Protocol, useGlobalDispatch } from "./GlobalProvider";
 import { useNavigate } from "react-router-dom";
 import { decodeToken } from "react-jwt";
+import Protocol from "../enums/Protocol";
+import { ActionType, useGlobalDispatch } from "./GlobalProvider";
 
 const Login = () => {
-  const globalDispatch = useGlobalDispatch();
   const navigate = useNavigate();
+  const globalDispatch = useGlobalDispatch();
 
   const handleSubmit = async (event) => {
     event.preventDefault();
@@ -20,14 +21,17 @@ const Login = () => {
     try {
       const response = await api.post("/api/login", data);
       const { accessToken, refreshToken } = response.data;
-      localStorage.setItem('accessToken', accessToken);
-      localStorage.setItem('refreshToken', refreshToken);
       const decodedToken = decodeToken(accessToken);
       globalDispatch({
-        type: Action.LOGIN,
+        type: ActionType.LOGIN,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
         protocol: Protocol.LDAP,
-        user: decodedToken.sub,
-      });
+        user:{
+          username: decodedToken.sub,
+          authorities: decodedToken.authorities
+        }
+      })
     } catch (error) {
       console.log(error);
     }

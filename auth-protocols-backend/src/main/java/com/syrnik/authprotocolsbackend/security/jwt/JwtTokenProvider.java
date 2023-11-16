@@ -1,8 +1,5 @@
 package com.syrnik.authprotocolsbackend.security.jwt;
 
-import static com.syrnik.authprotocolsbackend.constant.JwtClaims.AUTHORITIES;
-import static com.syrnik.authprotocolsbackend.constant.JwtClaims.PROTOCOL;
-
 import java.util.Date;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
@@ -23,38 +20,35 @@ import lombok.extern.slf4j.Slf4j;
 @Component
 public class JwtTokenProvider {
 
-    @Value("${jwt.access-token.secret}")
+    @Value("${app.jwt.access-token.secret}")
     private String jwtAccessTokenSecret;
 
-    @Value("${jwt.access-token.validity}")
+    @Value("${app.jwt.access-token.validity}")
     private Long jwtAccessTokenValidityInMinutes;
 
-    @Value("${jwt.refresh-token.secret}")
+    @Value("${app.jwt.refresh-token.secret}")
     private String jwtRefreshTokenSecret;
 
-    @Value("${jwt.refresh-token.validity}")
+    @Value("${app.jwt.refresh-token.validity}")
     private Long jwtRefreshTokenValidityInMinutes;
 
-    public String generateAccessToken(JwtTokenClaims jwtTokenClaims) {
-        return generateToken(jwtTokenClaims, jwtAccessTokenSecret, jwtAccessTokenValidityInMinutes);
-
+    public String generateAccessToken(Claims claims) {
+        return generateToken(claims, jwtAccessTokenSecret, jwtAccessTokenValidityInMinutes);
     }
 
-    public String generateRefreshToken(JwtTokenClaims jwtTokenClaims) {
-        return generateToken(jwtTokenClaims, jwtRefreshTokenSecret, jwtRefreshTokenValidityInMinutes);
+    public String generateRefreshToken(Claims claims) {
+        return generateToken(claims, jwtRefreshTokenSecret, jwtRefreshTokenValidityInMinutes);
     }
 
-    private String generateToken(JwtTokenClaims jwtTokenClaims, String tokenSecret, Long tokenValidityInMinutes) {
+    private String generateToken(Claims claims, String tokenSecret, Long tokenValidityInMinutes) {
         Date now = new Date();
         Date expiration = new Date(now.getTime() + tokenValidityInMinutes * 60 * 1000);
 
         return Jwts
               .builder()
-              .subject(jwtTokenClaims.username())
               .issuedAt(now)
               .expiration(expiration)
-              .claim(AUTHORITIES, jwtTokenClaims.authorities())
-              .claim(PROTOCOL, jwtTokenClaims.protocol())
+              .claims(claims)
               .signWith(SignatureAlgorithm.HS512, tokenSecret)
               .compact();
     }

@@ -5,7 +5,6 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.config.Customizer;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -21,7 +20,7 @@ import com.syrnik.authprotocolsbackend.security.CustomAuthenticationEntryPoint;
 import com.syrnik.authprotocolsbackend.security.CustomLogoutSuccessHandler;
 import com.syrnik.authprotocolsbackend.security.jwt.JwtTokenFilter;
 import com.syrnik.authprotocolsbackend.security.ldap.LdapAuthenticationSuccessHandler;
-import com.syrnik.authprotocolsbackend.security.oidc.JwtAuthConverter;
+import com.syrnik.authprotocolsbackend.security.oidc.OidcJwtConverter;
 import com.syrnik.authprotocolsbackend.security.oidc.OidcBearerTokenResolver;
 
 import lombok.RequiredArgsConstructor;
@@ -32,11 +31,8 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    @Value("${app.saml.success-url}")
-    private String samlSuccessUrl;
-
-    @Value("${app.logout.success-url}")
-    private String logoutSuccessUrl;
+    @Value("${app.frontend-url}")
+    private String frontendUrl;
 
     private final JwtTokenFilter jwtTokenFilter;
     private final LdapAuthenticationSuccessHandler ldapAuthenticationSuccessHandler;
@@ -49,16 +45,16 @@ public class SecurityConfiguration {
               .authorizeHttpRequests(auth -> auth
                     .requestMatchers("/api/public/**")
                     .permitAll()
+                    .requestMatchers("/api/saml2/**")
+                    .permitAll()
                     .requestMatchers("/api/auth/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
               .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
               .oauth2ResourceServer(oauth2 -> oauth2
-                    .jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(new JwtAuthConverter()))
+                    .jwt(jwtConfigurer -> jwtConfigurer.jwtAuthenticationConverter(new OidcJwtConverter()))
                     .bearerTokenResolver(oidcBearerTokenResolver))
-              .saml2Login(saml2Login -> saml2Login.defaultSuccessUrl(samlSuccessUrl))
-              .saml2Logout(Customizer.withDefaults())
               .formLogin(login -> login
                     .loginProcessingUrl("/api/login")
                     .successHandler(ldapAuthenticationSuccessHandler)
@@ -66,7 +62,7 @@ public class SecurityConfiguration {
                     .permitAll())
               .logout(logout -> logout
                     .logoutUrl("/api/logout")
-                    .logoutSuccessHandler(new CustomLogoutSuccessHandler(logoutSuccessUrl)))
+                    .logoutSuccessHandler(new CustomLogoutSuccessHandler(frontendUrl)))
               .exceptionHandling(exception -> exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
               .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
               .build();

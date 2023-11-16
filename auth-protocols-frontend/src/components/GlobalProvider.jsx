@@ -1,38 +1,29 @@
 import { createContext, useContext, useReducer } from "react";
 import OidcProvider from "./OidcProvider";
 
-const Protocol = {
-  OIDC: "OIDC",
-  SAML2: "SAML2",
-  LDAP: "LDAP",
-  KERBEROS: "KERBEROS",
-};
-
-const Action = {
+const ActionType = {
+  STATE: "STATE",
   LOGIN: "LOGIN",
-  LOGOUT: "LOGOUT"
-}
-
-const initialState = {
-  protocol: null,
-  isAuthenticated: false,
-  isLoading: false,
-  error: null,
-  user: null,
+  LOGOUT: "LOGOUT",
+  REFRESH: "REFRESH"
 };
+
+const initialState = {};
 
 const GlobalStateContext = createContext();
 const GlobalDispatchContext = createContext();
 
 function useGlobalState() {
   const context = useContext(GlobalStateContext);
-  if (!context) throw new Error("useGlobalState must be used in GlobalProvider");
+  if (!context)
+    throw new Error("useGlobalState must be used in GlobalProvider");
   return context;
 }
 
 function useGlobalDispatch() {
   const context = useContext(GlobalDispatchContext);
-  if (!context) throw new Error("useGlobalDispatch must be used in GlobalProvider");
+  if (!context)
+    throw new Error("useGlobalDispatch must be used in GlobalProvider");
   return context;
 }
 
@@ -49,21 +40,33 @@ function GlobalProvider(props) {
 }
 
 function reducer(state, action) {
-  if(action.type === Action.LOGIN) {
-    if(action.protocol === Protocol.OIDC) {
-      return {...state, protocol: Protocol.OIDC, isAuthenticated: true}
+  switch (action.type) {
+    case ActionType.STATE: {
+      return { ...state, ...action.state };
     }
-    if(action.protocol === Protocol.SAML2) {
-      return {...state, protocol: Protocol.SAML2, isAuthenticated: true}
+    case ActionType.LOGIN: {
+      localStorage.setItem("accessToken", action.accessToken);
+      localStorage.setItem("refreshToken", action.refreshToken);
+      localStorage.setItem("protocol", action.protocol);
+      localStorage.setItem("user", JSON.stringify(action.user));
+      return { ...state, user: action.user, protocol: action.protocol };
     }
-    if(action.protocol === Protocol.LDAP) {
-      return {...state, protocol: Protocol.LDAP, isAuthenticated: true, user: action.user }
+    case ActionType.LOGOUT: {
+      localStorage.removeItem("accessToken");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("protocol");
+      localStorage.removeItem("user");
+      return { ...initialState };
+    }
+    case ActionType.REFRESH: {
+      const protocol = localStorage.getItem("protocol");
+      const user = JSON.parse(localStorage.getItem("user"));
+      return { ...initialState, user, protocol };
+    }
+    default: {
+      throw Error("Unknown action: " + action.type);
     }
   }
-  if(action.type === Action.LOGOUT) {
-    return {...initialState};
-  }
-  return {...state}
 }
 
-export { GlobalProvider, useGlobalState, useGlobalDispatch, Action, Protocol };
+export { GlobalProvider, useGlobalState, useGlobalDispatch, ActionType };

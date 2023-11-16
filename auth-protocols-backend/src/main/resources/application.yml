@@ -8,21 +8,6 @@ spring:
         jwt:
           issuer-uri: http://auth-protocols-keycloak:8080/realms/auth-protocols-oidc
           jwk-set-uri: http://auth-protocols-keycloak:8080/realms/auth-protocols-oidc/protocol/openid-connect/certs
-    saml2:
-      relyingparty:
-        registration:
-          keycloak:
-            assertingparty:
-              metadata-uri: http://auth-protocols-keycloak:8080/realms/auth-protocols-saml2/protocol/saml/descriptor
-              singlesignon:
-                binding: POST
-            signing:
-              credentials:
-                - certificate-location: classpath:saml/local.crt
-                  private-key-location: classpath:saml/local.key
-            singlelogout:
-              binding: POST
-              response-url: "{baseUrl}/logout/saml2/slo"
   ldap:
     urls: ldap://localhost:389
     base: dc=auth-protocols,dc=com
@@ -30,15 +15,19 @@ spring:
     password: adminpassword
 
 app:
-  logout:
+  frontend-url: http://localhost:5173
+  saml2:
     success-url: http://localhost:5173
-  saml:
-    success-url: http://localhost:5173
-
-jwt:
-  access-token:
-    secret: FDTSiQPw7hmwLufNzQ4zReJqqOhSCO6OHcVYPKRs1IjDLCWCVusspwiBsvAfSGbtSvxYTA6YsF11e5VI2RDJxw==
-    validity: 5
-  refresh-token:
-    secret: P2Ppuv+578KztxHkSd//OwfPgU/f5hF3+taxPOqR+DtLqGc01lI7xzDiq+j/dQXmBwduM6cjQS5nwMtIMR6iDg==
-    validity: 30
+    metadata-url: http://localhost:8080/realms/auth-protocols-saml2/protocol/saml/descriptor
+    acs-url: http://localhost:8081/api/saml2/acs
+    ars-url: http://localhost:8080/realms/auth-protocols-saml2/protocol/saml/resolve
+    destination: http://localhost:8080/realms/auth-protocols-saml2/protocol/saml
+    issuer-id: http://localhost:8081/saml2/service-provider-metadata/keycloak
+    idp-issuer: http://localhost:8080/realms/auth-protocols-saml2
+  jwt:
+    access-token:
+      secret: FDTSiQPw7hmwLufNzQ4zReJqqOhSCO6OHcVYPKRs1IjDLCWCVusspwiBsvAfSGbtSvxYTA6YsF11e5VI2RDJxw==
+      validity: 5
+    refresh-token:
+      secret: P2Ppuv+578KztxHkSd//OwfPgU/f5hF3+taxPOqR+DtLqGc01lI7xzDiq+j/dQXmBwduM6cjQS5nwMtIMR6iDg==
+      validity: 30

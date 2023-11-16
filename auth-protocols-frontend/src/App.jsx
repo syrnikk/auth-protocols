@@ -3,39 +3,23 @@ import Navbar from "./components/Navbar";
 import Home from "./components/Home";
 import LoginWith from "./components/LoginWith";
 import { useAuth } from "react-oidc-context";
-import { Action, Protocol, useGlobalDispatch } from "./components/GlobalProvider";
 import { useEffect, useState } from "react";
 import Loading from "./components/Loading";
 import Error from "./components/Error";
 import Login from "./components/Login";
-import { decodeToken } from "react-jwt";
-import api from "./api/api";
+import Saml2ArtifactHandler from "./components/Saml2ArtifactHandler";
+import { ActionType, useGlobalDispatch } from "./components/GlobalProvider";
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
-  const globalDispatch = useGlobalDispatch();
   const oidc = useAuth();
+  const globalDispatch = useGlobalDispatch();
+  console.log(oidc.user)
 
   useEffect(() => {
-    if (oidc.isAuthenticated) {
-      globalDispatch({ type: Action.LOGIN, protocol: Protocol.OIDC });
-    }
-  }, [oidc.isAuthenticated]);
-
-  useEffect(() => {
-    const checkAccessToken = () => {
-      const accessToken = localStorage.getItem("accessToken");
-      if (accessToken) {
-        const decodedToken = decodeToken(accessToken);
-        globalDispatch({
-          type: Action.LOGIN,
-          protocol: decodedToken.protocol,
-          user: decodedToken.sub,
-        });
-      }
-    };
-
-    checkAccessToken();
+    globalDispatch({
+      type: ActionType.REFRESH,
+    });
   }, []);
 
   const showLoading = () => {
@@ -68,6 +52,7 @@ function App() {
             element={<LoginWith onShowLoading={showLoading} />}
           />
           <Route path="/login" element={<Login />} />
+          <Route path="/saml2" element={<Saml2ArtifactHandler />} />
         </Routes>
       </BrowserRouter>
     </>
