@@ -21,6 +21,7 @@ app:
     metadata-url: http://localhost:8080/realms/auth-protocols-saml2/protocol/saml/descriptor
     acs-url: http://localhost:8081/api/saml2/acs
     ars-url: http://localhost:8080/realms/auth-protocols-saml2/protocol/saml/resolve
+    slo-url: http://localhost:8080/realms/auth-protocols-saml2/protocol/saml
     destination: http://localhost:8080/realms/auth-protocols-saml2/protocol/saml
     issuer-id: http://localhost:8081/saml2/service-provider-metadata/keycloak
     idp-issuer: http://localhost:8080/realms/auth-protocols-saml2

@@ -6,6 +6,7 @@ import config from "../config/config";
 import Protocol from "../enums/Protocol";
 import useGlobalAuth from "../hooks/useGlobalAuth";
 import { ActionType, useGlobalDispatch } from "./GlobalProvider";
+import api from "../api/api";
 
 const Logout = () => {
   const samlLogoutFormRef = useRef();
@@ -14,14 +15,17 @@ const Logout = () => {
   const globalAuth = useGlobalAuth();
   const globalDispatch = useGlobalDispatch();
 
-  const logout = () => {
+  const logout = async () => {
     if (globalAuth.getProtocol() === Protocol.OIDC) {
       oidc.removeUser();
       oidc.signoutRedirect();
     }
+    if (globalAuth.getProtocol() === Protocol.SAML2) {
+      const response = await api.post("/api/saml2/logout");
+    }
     globalDispatch({
-        type: ActionType.LOGOUT
-    })
+      type: ActionType.LOGOUT,
+    });
 
     navigate("/");
   };
@@ -29,11 +33,6 @@ const Logout = () => {
   return (
     <>
       <MenuItem onClick={logout}>Log out</MenuItem>
-      <form
-        ref={samlLogoutFormRef}
-        action={config.SAML_LOGOUT_URI}
-        method="post"
-      />
     </>
   );
 };

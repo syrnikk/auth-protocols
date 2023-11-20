@@ -4,6 +4,7 @@ import static com.syrnik.authprotocolsbackend.security.jwt.JwtClaims.AUTHORITIES
 import static com.syrnik.authprotocolsbackend.security.jwt.JwtClaims.PROTOCOL;
 import static com.syrnik.authprotocolsbackend.security.jwt.JwtClaims.SESSION_INDEX;
 
+import org.opensaml.saml.saml2.core.LogoutRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -26,6 +27,7 @@ import com.syrnik.authprotocolsbackend.security.saml2.Saml2Service;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 
+import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 
@@ -46,9 +48,10 @@ public class Saml2Controller {
 
 
     @GetMapping("/saml2/create")
-    public Saml2RequestResponse createSaml2Request() throws Exception {
+    public ResponseEntity<Saml2RequestResponse> createAuthnRequest() throws Exception {
         String authnRequestEncoded = saml2Service.createAuthnRequestEncoded();
-        return new Saml2RequestResponse(destination, authnRequestEncoded);
+        Saml2RequestResponse saml2RequestResponse = new Saml2RequestResponse(destination, authnRequestEncoded);
+        return ResponseEntity.ok(saml2RequestResponse);
     }
 
     @PostMapping("/saml2/acs")
@@ -70,5 +73,15 @@ public class Saml2Controller {
         String accessToken = jwtTokenProvider.generateAccessToken(claims);
         String refreshToken = jwtTokenProvider.generateRefreshToken(claims);
         return ResponseEntity.ok(new JwtResponse(accessToken, refreshToken));
+    }
+
+    @PostMapping("/saml2/logout")
+    public ResponseEntity<Void> createLogoutRequest(HttpServletRequest httpServletRequest) throws Exception {
+        String accessToken = jwtTokenProvider.resolveToken(httpServletRequest);
+        Claims claims = jwtTokenProvider.extractAccessTokenClaims(accessToken);
+        LogoutRequest logoutRequest = saml2Service.createLogoutRequest(claims.get(SESSION_INDEX, String.class),
+              claims.getSubject());
+        saml2Service.sendLogoutRequest(logoutRequest);
+        return ResponseEntity.ok().build();
     }
 }

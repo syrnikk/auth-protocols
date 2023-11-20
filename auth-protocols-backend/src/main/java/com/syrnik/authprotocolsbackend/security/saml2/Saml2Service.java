@@ -7,6 +7,7 @@ import java.net.http.HttpResponse;
 import java.nio.charset.StandardCharsets;
 import java.security.cert.X509Certificate;
 import java.util.Base64;
+import org.opensaml.core.xml.XMLObject;
 import org.opensaml.core.xml.util.XMLObjectSupport;
 import org.opensaml.messaging.context.InOutOperationContext;
 import org.opensaml.messaging.context.MessageContext;
@@ -14,6 +15,9 @@ import org.opensaml.saml.saml2.core.ArtifactResolve;
 import org.opensaml.saml.saml2.core.ArtifactResponse;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AuthnRequest;
+import org.opensaml.saml.saml2.core.LogoutRequest;
+import org.opensaml.saml.saml2.core.LogoutResponse;
+import org.opensaml.saml.saml2.core.RequestAbstractType;
 import org.opensaml.saml.saml2.core.Response;
 import org.opensaml.saml.saml2.core.StatusCode;
 import org.opensaml.soap.client.http.HttpSOAPClient;
@@ -40,6 +44,9 @@ public class Saml2Service {
     @Value("${app.saml2.ars-url}")
     private String artifactResolutionServiceUrl;
 
+    @Value("${app.saml2.slo-url}")
+    private String singleLogoutServiceUrl;
+
     @Value("${app.saml2.destination}")
     private String destination;
 
@@ -53,6 +60,10 @@ public class Saml2Service {
         AuthnRequest authnRequest = Saml2Util.buildAuthnRequest(assertionConsumerServiceUrl, destination, issuerId);
         String stringAuthnRequest = Saml2Util.xmlObjectToString(authnRequest);
         return Base64.getEncoder().encodeToString(stringAuthnRequest.getBytes(StandardCharsets.UTF_8));
+    }
+
+    public LogoutRequest createLogoutRequest(String sessionIndex, String nameID) throws Exception {
+        return Saml2Util.buildLogoutRequest(sessionIndex, nameID, destination, issuerId);
     }
 
     public AssertionData getAssertionData(String samlArt) throws Exception {
@@ -90,11 +101,22 @@ public class Saml2Service {
         }
     }
 
+    public void sendLogoutRequest(LogoutRequest logoutRequest) throws Exception {
+        LogoutResponse logoutResponse = (LogoutResponse) sendRequest(singleLogoutServiceUrl, logoutRequest);
+        if(!StatusCode.SUCCESS.equals(logoutResponse.getStatus().getStatusCode().getValue())) {
+            throw new RuntimeException("SAML2 Logout Response Error");
+        }
+    }
+
     private ArtifactResponse sendArtifactResolve(ArtifactResolve artifactResolve) throws Exception {
+        return (ArtifactResponse) sendRequest(artifactResolutionServiceUrl, artifactResolve);
+    }
+
+    private XMLObject sendRequest(String endpoint, RequestAbstractType requestAbstractType) throws Exception {
         HttpSOAPClient soapClient = Saml2Util.buildSoapClient();
 
         Body body = (Body) XMLObjectSupport.buildXMLObject(Body.DEFAULT_ELEMENT_NAME);
-        body.getUnknownXMLObjects().add(artifactResolve);
+        body.getUnknownXMLObjects().add(requestAbstractType);
         Envelope envelope = (Envelope) XMLObjectSupport.buildXMLObject(Envelope.DEFAULT_ELEMENT_NAME);
         envelope.setBody(body);
 
@@ -102,7 +124,7 @@ public class Saml2Service {
         soap11Context.setEnvelope(envelope);
 
         MessageContext outboundMessageContext = new MessageContext();
-        outboundMessageContext.setMessage(artifactResolve);
+        outboundMessageContext.setMessage(requestAbstractType);
         outboundMessageContext.addSubcontext(soap11Context);
         InOutOperationContext context = new InOutOperationContext(null, outboundMessageContext);
 
@@ -110,9 +132,9 @@ public class Saml2Service {
               SecurityParametersContext.class, true);
         securityParametersContext.setSignatureSigningParameters(Saml2Util.buildSignatureSigningParameters());
 
-        soapClient.send(artifactResolutionServiceUrl, context);
+        soapClient.send(endpoint, context);
 
-        return (ArtifactResponse) context
+        return context
               .getInboundMessageContext()
               .getSubcontext(SOAP11Context.class)
               .getEnvelope()

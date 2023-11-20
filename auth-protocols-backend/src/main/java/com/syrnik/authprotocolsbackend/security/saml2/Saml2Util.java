@@ -32,10 +32,16 @@ import org.opensaml.saml.saml2.core.ArtifactResolve;
 import org.opensaml.saml.saml2.core.Assertion;
 import org.opensaml.saml.saml2.core.AuthnRequest;
 import org.opensaml.saml.saml2.core.Issuer;
+import org.opensaml.saml.saml2.core.LogoutRequest;
+import org.opensaml.saml.saml2.core.NameID;
+import org.opensaml.saml.saml2.core.SessionIndex;
 import org.opensaml.saml.saml2.core.impl.ArtifactBuilder;
 import org.opensaml.saml.saml2.core.impl.ArtifactResolveBuilder;
 import org.opensaml.saml.saml2.core.impl.AuthnRequestBuilder;
 import org.opensaml.saml.saml2.core.impl.IssuerBuilder;
+import org.opensaml.saml.saml2.core.impl.LogoutRequestBuilder;
+import org.opensaml.saml.saml2.core.impl.NameIDBuilder;
+import org.opensaml.saml.saml2.core.impl.SessionIndexBuilder;
 import org.opensaml.security.credential.Credential;
 import org.opensaml.security.x509.BasicX509Credential;
 import org.opensaml.soap.client.http.HttpSOAPClient;
@@ -46,8 +52,6 @@ import org.opensaml.xmlsec.signature.support.SignatureConstants;
 import org.opensaml.xmlsec.signature.support.SignatureException;
 import org.opensaml.xmlsec.signature.support.SignatureValidator;
 import org.opensaml.xmlsec.signature.support.Signer;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NodeList;
@@ -92,6 +96,21 @@ public class Saml2Util {
         Saml2Util.sign(authnRequest);
 
         return authnRequest;
+    }
+
+    public static LogoutRequest buildLogoutRequest(String sessionIndex, String nameID, String destination,
+          String issuerId) throws Exception {
+        LogoutRequest logoutRequest = new LogoutRequestBuilder().buildObject();
+        logoutRequest.setID("_" + UUID.randomUUID());
+        logoutRequest.setIssueInstant(Instant.now());
+        logoutRequest.setNameID(buildNameID(nameID));
+        logoutRequest.setDestination(destination);
+        logoutRequest.setIssuer(Saml2Util.buildIssuer(issuerId));
+        logoutRequest.getSessionIndexes().add(buildSessionIndex(sessionIndex));
+
+        sign(logoutRequest);
+
+        return logoutRequest;
     }
 
     public static void validateSignature(Assertion assertion, X509Certificate certificate) throws SignatureException {
@@ -152,6 +171,18 @@ public class Saml2Util {
         Issuer issuer = new IssuerBuilder().buildObject();
         issuer.setValue(issuerId);
         return issuer;
+    }
+
+    public static NameID buildNameID(String nameIDValue) {
+        NameID nameID = new NameIDBuilder().buildObject();
+        nameID.setValue(nameIDValue);
+        return nameID;
+    }
+
+    public static SessionIndex buildSessionIndex(String sessionIndexValue) {
+        SessionIndex sessionIndex = new SessionIndexBuilder().buildObject();
+        sessionIndex.setValue(sessionIndexValue);
+        return sessionIndex;
     }
 
     public static Artifact buildArtifact(String samlArt) {
