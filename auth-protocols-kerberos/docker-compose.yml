@@ -1,0 +1,9 @@
+version: '3.8'
+
+services:
+  kerberos:
+    build: .
+    ports:
+      - "88:88"
+      - "749:749"
+    hostname: kerberos.auth-protocols.com

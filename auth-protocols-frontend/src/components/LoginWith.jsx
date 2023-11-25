@@ -33,6 +33,15 @@ const LoginWith = ({ onShowLoading }) => {
     navigate("/login");
   };
 
+  const kerberosLogin = async () => {
+    try {
+      const response = await api.get("/api/kerberos");
+      console.log(response)
+    } catch (error) {
+      console.log(error);
+    }
+  }
+
   return (
     <Box
       sx={{
@@ -72,7 +81,7 @@ const LoginWith = ({ onShowLoading }) => {
           <AuthCard imageSrc={ldapLogo} text="LDAP" onClick={ldapLogin} />
         </Grid>
         <Grid item>
-          <AuthCard imageSrc={kerberosLogo} text="Kerberos" />
+          <AuthCard imageSrc={kerberosLogo} text="Kerberos" onClick={kerberosLogin} />
         </Grid>
       </Grid>
     </Box>

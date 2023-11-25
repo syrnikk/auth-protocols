@@ -22,4 +22,8 @@ public class TestController {
         return ResponseEntity.ok().build();
     }
 
+    @GetMapping("/kerberos")
+    public ResponseEntity<?> kerberos() {
+        return ResponseEntity.ok("OK");
+    }
 }

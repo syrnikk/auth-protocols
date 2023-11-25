@@ -5,7 +5,7 @@ const config = {
   OIDC_REDIRECT_URI: "http://localhost:5173",
   OIDC_POST_LOGOUT_REDIRECT_URI: "http://localhost:5173",
   SAML_AUTHENTICATION_REQUEST_URI:
-    "http://localhost:8081/saml2/authenticate/keycloak",
+    "http://auth-protocols-keycloak:8080/realms/auth-protocols-saml2/protocol/saml",
   SAML_LOGOUT_URI: "http://localhost:8081/api/logout",
   LDAP_LOGOUT_URI: "/api/logout",
 };

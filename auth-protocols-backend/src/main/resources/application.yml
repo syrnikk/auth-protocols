@@ -25,6 +25,9 @@ app:
     destination: http://localhost:8080/realms/auth-protocols-saml2/protocol/saml
     issuer-id: http://localhost:8081/saml2/service-provider-metadata/keycloak
     idp-issuer: http://localhost:8080/realms/auth-protocols-saml2
+  kerberos:
+    spn: HTTP/desktop-a194p2n@AUTH-PROTOCOLS.COM
+    krb-conf-location: C:\Users\Kacper\Desktop\auth-protocols-parent\auth-protocols-backend\src\main\resources\kerberos\krb5.conf
   jwt:
     access-token:
       secret: FDTSiQPw7hmwLufNzQ4zReJqqOhSCO6OHcVYPKRs1IjDLCWCVusspwiBsvAfSGbtSvxYTA6YsF11e5VI2RDJxw==
