@@ -1,7 +1,6 @@
-version: '3'
+version: '3.8'
 
 services:
-
   openldap:
     image: osixia/openldap:${LDAP_VERSION}
     environment:
@@ -14,8 +13,10 @@ services:
     volumes:
       - ./data:/var/lib/ldap
       - ./config:/etc/ldap/slapd.d
-      - ./initial:/initial
-    command: [ "/bin/bash", "/initial/ldap-init.sh" ]
+    hostname: openldap
+    domainname: auth-protocols.com
+    networks:
+      - auth-protocols-network
 
   phpldapadmin:
     image: osixia/phpldapadmin:${PHPLDAPADMIN_VERSION}
@@ -23,6 +24,14 @@ services:
       PHPLDAPADMIN_LDAP_HOSTS: openldap
       PHPLDAPADMIN_HTTPS: 'false'
     ports:
-      - "80:80"
+      - "8081:80"
     depends_on:
       - openldap
+    hostname: phpldapadmin
+    domainname: auth-protocols.com
+    networks:
+      - auth-protocols-network
+
+networks:
+  auth-protocols-network:
+    external: true

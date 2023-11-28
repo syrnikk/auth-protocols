@@ -1,7 +1,6 @@
-version: '3.9'
+version: '3.8'
 
 services:
-
   postgres:
     image: postgres:${POSTGRES_VERSION}
     environment:
@@ -10,6 +9,10 @@ services:
       POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
     ports:
       - '5432:5432'
+    hostname: postgres
+    domainname: auth-protocols.com
+    networks:
+      - auth-protocols-network
 
   keycloak:
     image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
@@ -30,3 +33,11 @@ services:
       - postgres
     volumes:
       - "./keycloak:/opt/keycloak/data/import"
+    hostname: keycloak
+    domainname: auth-protocols.com
+    networks:
+      - auth-protocols-network
+
+networks:
+  auth-protocols-network:
+    external: true

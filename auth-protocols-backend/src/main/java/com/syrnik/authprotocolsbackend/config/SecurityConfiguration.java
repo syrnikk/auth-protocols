@@ -4,7 +4,6 @@ import java.util.Collections;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.core.io.ClassPathResource;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.ldap.core.support.BaseLdapPathContextSource;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -29,7 +28,6 @@ import org.springframework.security.web.authentication.AuthenticationEntryPointF
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 import com.syrnik.authprotocolsbackend.security.CustomAuthenticationEntryPoint;
-import com.syrnik.authprotocolsbackend.security.CustomLogoutSuccessHandler;
 import com.syrnik.authprotocolsbackend.security.jwt.JwtTokenFilter;
 import com.syrnik.authprotocolsbackend.security.ldap.LdapAuthenticationSuccessHandler;
 import com.syrnik.authprotocolsbackend.security.oidc.OidcJwtConverter;
@@ -42,14 +40,14 @@ import lombok.RequiredArgsConstructor;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
 
-    @Value("${app.frontend-url}")
-    private String frontendUrl;
-
     @Value("${app.kerberos.spn}")
     private String servicePrincipalName;
 
     @Value("${app.kerberos.krb-conf-location}")
     private String krbConfLocation;
+
+    @Value("${app.kerberos.keytab-location}")
+    private String keytabLocation;
 
     private final JwtTokenFilter jwtTokenFilter;
     private final LdapAuthenticationSuccessHandler ldapAuthenticationSuccessHandler;
@@ -91,9 +89,6 @@ public class SecurityConfiguration {
                     .successHandler(ldapAuthenticationSuccessHandler)
                     .failureHandler(new AuthenticationEntryPointFailureHandler(new CustomAuthenticationEntryPoint()))
                     .permitAll())
-              .logout(logout -> logout
-                    .logoutUrl("/api/logout")
-                    .logoutSuccessHandler(new CustomLogoutSuccessHandler(frontendUrl)))
               .exceptionHandling(exception -> exception.authenticationEntryPoint(new CustomAuthenticationEntryPoint()))
               .addFilterBefore(jwtTokenFilter, UsernamePasswordAuthenticationFilter.class)
               .build();
@@ -125,7 +120,7 @@ public class SecurityConfiguration {
     public SunJaasKerberosTicketValidator sunJaasKerberosTicketValidator() {
         SunJaasKerberosTicketValidator ticketValidator = new SunJaasKerberosTicketValidator();
         ticketValidator.setServicePrincipal(servicePrincipalName);
-        ticketValidator.setKeyTabLocation(new ClassPathResource("kerberos/krb5.keytab"));
+        ticketValidator.setKeyTabLocation(new FileSystemResource(keytabLocation));
         ticketValidator.setDebug(true);
         return ticketValidator;
     }

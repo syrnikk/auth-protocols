@@ -104,26 +104,6 @@
       }
     ],
     "client": {
-      "http://localhost:8081/saml2/service-provider-metadata/keycloak": [
-        {
-          "id": "3e1f9e86-9dbf-4b48-a4ce-fd44f7a1d081",
-          "name": "admin",
-          "description": "Admin role",
-          "composite": false,
-          "clientRole": true,
-          "containerId": "55cad098-b757-40c8-8054-b8e556cb56c5",
-          "attributes": {}
-        },
-        {
-          "id": "b9aa2398-a404-4de2-ba30-a447cf3b7b1f",
-          "name": "user",
-          "description": "User role\n",
-          "composite": false,
-          "clientRole": true,
-          "containerId": "55cad098-b757-40c8-8054-b8e556cb56c5",
-          "attributes": {}
-        }
-      ],
       "realm-management": [
         {
           "id": "78c4da95-1fd2-4a72-ab68-20f447d85d87",
@@ -333,6 +313,26 @@
           "composite": false,
           "clientRole": true,
           "containerId": "a7506358-2aef-4fbe-9b72-3c812ca8a203",
+          "attributes": {}
+        }
+      ],
+      "http://backend.auth-protocols.com:3000/saml2/service-provider-metadata/keycloak": [
+        {
+          "id": "3e1f9e86-9dbf-4b48-a4ce-fd44f7a1d081",
+          "name": "admin",
+          "description": "Admin role",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "55cad098-b757-40c8-8054-b8e556cb56c5",
+          "attributes": {}
+        },
+        {
+          "id": "b9aa2398-a404-4de2-ba30-a447cf3b7b1f",
+          "name": "user",
+          "description": "User role\n",
+          "composite": false,
+          "clientRole": true,
+          "containerId": "55cad098-b757-40c8-8054-b8e556cb56c5",
           "attributes": {}
         }
       ],
@@ -627,7 +627,9 @@
       "publicClient": true,
       "frontchannelLogout": false,
       "protocol": "openid-connect",
-      "attributes": {},
+      "attributes": {
+        "post.logout.redirect.uris": "+"
+      },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
       "nodeReRegistrationTimeout": 0,
@@ -665,7 +667,9 @@
       "publicClient": false,
       "frontchannelLogout": false,
       "protocol": "openid-connect",
-      "attributes": {},
+      "attributes": {
+        "post.logout.redirect.uris": "+"
+      },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
       "nodeReRegistrationTimeout": 0,
@@ -685,12 +689,12 @@
     },
     {
       "id": "55cad098-b757-40c8-8054-b8e556cb56c5",
-      "clientId": "http://localhost:8081/saml2/service-provider-metadata/keycloak",
+      "clientId": "http://backend.auth-protocols.com:3000/saml2/service-provider-metadata/keycloak",
       "name": "",
       "description": "",
-      "rootUrl": "http://localhost:8081/",
+      "rootUrl": "http://backend.auth-protocols.com:3000/",
       "adminUrl": "",
-      "baseUrl": "http://localhost:8081/",
+      "baseUrl": "http://backend.auth-protocols.com:3000/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -710,10 +714,10 @@
       "frontchannelLogout": true,
       "protocol": "saml",
       "attributes": {
-        "saml.assertion.signature": "false",
+        "saml.assertion.signature": "true",
         "saml.force.post.binding": "true",
-        "saml_single_logout_service_url_post": "http://localhost:8081/logout/saml2/slo",
         "saml.encrypt": "false",
+        "post.logout.redirect.uris": "+",
         "oauth2.device.authorization.grant.enabled": "false",
         "saml.server.signature": "true",
         "saml.server.signature.keyinfo.ext": "false",
@@ -721,7 +725,6 @@
         "oidc.ciba.grant.enabled": "false",
         "saml.artifact.binding.identifier": "DSqd1VN/Q8eDRzsL52bW5WO5U/s=",
         "saml.artifact.binding": "false",
-        "saml_single_logout_service_url_redirect": "http://localhost:8081/logout/saml2/slo",
         "saml.signature.algorithm": "RSA_SHA256",
         "saml_force_name_id_format": "false",
         "saml.client.signature": "true",
@@ -761,7 +764,9 @@
       "publicClient": false,
       "frontchannelLogout": false,
       "protocol": "openid-connect",
-      "attributes": {},
+      "attributes": {
+        "post.logout.redirect.uris": "+"
+      },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
       "nodeReRegistrationTimeout": 0,
@@ -1251,6 +1256,7 @@
           "consentRequired": false,
           "config": {
             "multivalued": "true",
+            "userinfo.token.claim": "true",
             "user.attribute": "foo",
             "id.token.claim": "true",
             "access.token.claim": "true",
@@ -1346,7 +1352,8 @@
           "consentRequired": false,
           "config": {
             "id.token.claim": "true",
-            "access.token.claim": "true"
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
           }
         }
       ]
@@ -1431,14 +1438,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-user-property-mapper",
             "oidc-address-mapper",
-            "oidc-usermodel-property-mapper",
             "oidc-sha256-pairwise-sub-mapper",
-            "saml-role-list-mapper",
-            "oidc-full-name-mapper",
             "oidc-usermodel-attribute-mapper",
-            "saml-user-attribute-mapper"
+            "saml-user-property-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-full-name-mapper",
+            "oidc-usermodel-property-mapper",
+            "saml-role-list-mapper"
           ]
         }
       },
@@ -1462,14 +1469,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-full-name-mapper",
-            "oidc-address-mapper",
+            "oidc-usermodel-attribute-mapper",
             "oidc-usermodel-property-mapper",
             "saml-user-property-mapper",
             "oidc-sha256-pairwise-sub-mapper",
+            "saml-role-list-mapper",
+            "oidc-address-mapper",
             "saml-user-attribute-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "saml-role-list-mapper"
+            "oidc-full-name-mapper"
           ]
         }
       },
@@ -2188,8 +2195,8 @@
     "cibaExpiresIn": "120",
     "cibaAuthRequestedUserHint": "login_hint",
     "oauth2DeviceCodeLifespan": "600",
-    "oauth2DevicePollingInterval": "5",
     "clientOfflineSessionMaxLifespan": "0",
+    "oauth2DevicePollingInterval": "5",
     "clientSessionIdleTimeout": "0",
     "parRequestUriLifespan": "60",
     "clientSessionMaxLifespan": "0",

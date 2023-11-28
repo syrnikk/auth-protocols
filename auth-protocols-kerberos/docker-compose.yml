@@ -6,4 +6,11 @@ services:
     ports:
       - "88:88"
       - "749:749"
-    hostname: kerberos.auth-protocols.com
+    hostname: kerberos
+    domainname: auth-protocols.com
+    networks:
+      - auth-protocols-network
+
+networks:
+  auth-protocols-network:
+    external: true

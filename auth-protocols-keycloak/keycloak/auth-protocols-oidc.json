@@ -106,7 +106,6 @@
       }
     ],
     "client": {
-      "http://localhost:8081/saml2/service-provider-metadata/keycloak": [],
       "realm-management": [
         {
           "id": "6a06575e-958f-4a48-b187-97f781fd5908",
@@ -630,7 +629,9 @@
       "publicClient": true,
       "frontchannelLogout": false,
       "protocol": "openid-connect",
-      "attributes": {},
+      "attributes": {
+        "post.logout.redirect.uris": "+"
+      },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
       "nodeReRegistrationTimeout": 0,
@@ -653,16 +654,15 @@
       "clientId": "auth-protocols-client-oidc",
       "name": "",
       "description": "",
-      "rootUrl": "http://auth-protocols-frontend:5173/",
-      "adminUrl": "http://auth-protocols-frontend:5173/",
-      "baseUrl": "http://auth-protocols-frontend:5173/",
+      "rootUrl": "http://frontend.auth-protocols.com/",
+      "adminUrl": "http://frontend.auth-protocols.com/",
+      "baseUrl": "http://frontend.auth-protocols.com/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
       "clientAuthenticatorType": "client-secret",
       "redirectUris": [
-        "http://localhost:5173/*",
-        "http://auth-protocols-frontend:5173/*"
+        "http://frontend.auth-protocols.com/*"
       ],
       "webOrigins": [
         "*"
@@ -678,7 +678,7 @@
       "frontchannelLogout": true,
       "protocol": "openid-connect",
       "attributes": {
-        "post.logout.redirect.uris": "http://localhost:5173/*##http://auth-protocols-frontend:5173/",
+        "post.logout.redirect.uris": "http://frontend.auth-protocols.com/*",
         "oauth2.device.authorization.grant.enabled": "false",
         "backchannel.logout.revoke.offline.tokens": "false",
         "use.refresh.tokens": "true",
@@ -728,7 +728,9 @@
       "publicClient": false,
       "frontchannelLogout": false,
       "protocol": "openid-connect",
-      "attributes": {},
+      "attributes": {
+        "post.logout.redirect.uris": "+"
+      },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
       "nodeReRegistrationTimeout": 0,
@@ -745,62 +747,6 @@
         "offline_access",
         "microprofile-jwt"
       ]
-    },
-    {
-      "id": "13d2f8f6-97fa-45c0-a1b1-5326075e72df",
-      "clientId": "http://localhost:8081/saml2/service-provider-metadata/keycloak",
-      "name": "",
-      "description": "",
-      "rootUrl": "http://localhost:8081/",
-      "adminUrl": "",
-      "baseUrl": "http://localhost:8081/",
-      "surrogateAuthRequired": false,
-      "enabled": true,
-      "alwaysDisplayInConsole": true,
-      "clientAuthenticatorType": "client-secret",
-      "redirectUris": [
-        "*"
-      ],
-      "webOrigins": [],
-      "notBefore": 0,
-      "bearerOnly": false,
-      "consentRequired": false,
-      "standardFlowEnabled": true,
-      "implicitFlowEnabled": false,
-      "directAccessGrantsEnabled": true,
-      "serviceAccountsEnabled": false,
-      "publicClient": true,
-      "frontchannelLogout": true,
-      "protocol": "saml",
-      "attributes": {
-        "saml.assertion.signature": "false",
-        "saml.force.post.binding": "true",
-        "saml_single_logout_service_url_post": "http://localhost:8081/logout/saml2/slo",
-        "saml.encrypt": "false",
-        "saml.server.signature": "true",
-        "saml.server.signature.keyinfo.ext": "false",
-        "saml.signing.certificate": "MIIDazCCAlOgAwIBAgIUN1xw6B6JaCOiZouxOGAKrrojIVQwDQYJKoZIhvcNAQELBQAwRTELMAkGA1UEBhMCUEwxEzARBgNVBAgMClNvbWUtU3RhdGUxITAfBgNVBAoMGEludGVybmV0IFdpZGdpdHMgUHR5IEx0ZDAeFw0yMzEwMjUxNjA1MzlaFw0yNDEwMjQxNjA1MzlaMEUxCzAJBgNVBAYTAlBMMRMwEQYDVQQIDApTb21lLVN0YXRlMSEwHwYDVQQKDBhJbnRlcm5ldCBXaWRnaXRzIFB0eSBMdGQwggEiMA0GCSqGSIb3DQEBAQUAA4IBDwAwggEKAoIBAQCqDPbygSiBEXCJa9C5AQ3ZObMSjqPO6c7VyCjuOKIxxzD/vNs6pgP7ELFWJpXUZSTwYiPCO4e+Q0fgIcRhWCFWvQkRdKAKA37XZfds1VvQdYGagiGlIkNRF907fggBlye+5BD1UUOpzSBu3iPqb6vZ97hwP5V4V1TsXY/pgwcQ82nH/KMuy86AK83+3pb6PgXdoV/aoTo6lNf6FXfX2nDJULT+1YKPNWeeiE1ole1nkT3pB/hXEEf44PEzu/X1KIc1mK+Q5zWIUHeJccr3RrIL1osPGKjRP+l2WbChKDD/mg+fCG74vYUzUG0D3vMrV0VqO06cXzwn1JvmCRbaaKMbAgMBAAGjUzBRMB0GA1UdDgQWBBSn+o3h8gaz+cLrRw2wb1Mbi2PxTDAfBgNVHSMEGDAWgBSn+o3h8gaz+cLrRw2wb1Mbi2PxTDAPBgNVHRMBAf8EBTADAQH/MA0GCSqGSIb3DQEBCwUAA4IBAQCIHAUnsoZQvgqW9DwvDaL+O3nfaW0PbvBPkIhDZrQgzAkI9wzRa68cP5D6/wnmCvs5PBiGWXdqlms8/xfMe7Hj3l4X93ia92cV5XA6gXV31+PqzVz1t5xTjOoZTzYMCWJGiOZxU1QC0toIpndXVIaqPccxqC0wTgULRGwviTQNrnxe2btp5mz/CO1GT36VWuQRrBx2ssLRcajRvIxZYqGJvvm4s1ZY5AW3gbyqhg30EnlYjQHM1GNja5DX4MQFyXpl/GhgJtoRnjiTr4bVAn/kUtxvub9IsYoSlpHkuj2YM+nCJGL+F4u4DV6VavpIZ4ENNAOiX9k4jrOWSdB75URw",
-        "saml.artifact.binding.identifier": "DSqd1VN/Q8eDRzsL52bW5WO5U/s=",
-        "saml.artifact.binding": "false",
-        "saml_single_logout_service_url_redirect": "http://localhost:8081/logout/saml2/slo",
-        "saml.signature.algorithm": "RSA_SHA256",
-        "saml_force_name_id_format": "false",
-        "saml.client.signature": "true",
-        "saml.authnstatement": "true",
-        "display.on.consent.screen": "false",
-        "saml_name_id_format": "username",
-        "saml.allow.ecp.flow": "false",
-        "saml_signature_canonicalization_method": "http://www.w3.org/2001/10/xml-exc-c14n#",
-        "saml.onetimeuse.condition": "false",
-        "saml.server.signature.keyinfo.xmlSigKeyInfoKeyNameTransformer": "NONE"
-      },
-      "authenticationFlowBindingOverrides": {},
-      "fullScopeAllowed": true,
-      "nodeReRegistrationTimeout": -1,
-      "defaultClientScopes": [
-        "role_list"
-      ],
-      "optionalClientScopes": []
     },
     {
       "id": "f5732bd2-7041-4366-a94a-78764133240d",
@@ -822,7 +768,9 @@
       "publicClient": false,
       "frontchannelLogout": false,
       "protocol": "openid-connect",
-      "attributes": {},
+      "attributes": {
+        "post.logout.redirect.uris": "+"
+      },
       "authenticationFlowBindingOverrides": {},
       "fullScopeAllowed": false,
       "nodeReRegistrationTimeout": 0,
@@ -980,6 +928,7 @@
           "consentRequired": false,
           "config": {
             "multivalued": "true",
+            "userinfo.token.claim": "true",
             "user.attribute": "foo",
             "id.token.claim": "true",
             "access.token.claim": "true",
@@ -1120,7 +1069,8 @@
           "consentRequired": false,
           "config": {
             "id.token.claim": "true",
-            "access.token.claim": "true"
+            "access.token.claim": "true",
+            "userinfo.token.claim": "true"
           }
         }
       ]
@@ -1516,14 +1466,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "saml-user-attribute-mapper",
-            "oidc-usermodel-property-mapper",
-            "saml-role-list-mapper",
-            "saml-user-property-mapper",
             "oidc-sha256-pairwise-sub-mapper",
+            "oidc-usermodel-property-mapper",
             "oidc-full-name-mapper",
+            "saml-role-list-mapper",
+            "saml-user-attribute-mapper",
             "oidc-usermodel-attribute-mapper",
-            "oidc-address-mapper"
+            "oidc-address-mapper",
+            "saml-user-property-mapper"
           ]
         }
       },
@@ -1535,14 +1485,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-property-mapper",
-            "oidc-full-name-mapper",
-            "oidc-usermodel-attribute-mapper",
-            "saml-user-attribute-mapper",
-            "saml-user-property-mapper",
             "oidc-address-mapper",
-            "saml-role-list-mapper"
+            "oidc-usermodel-attribute-mapper",
+            "saml-role-list-mapper",
+            "saml-user-attribute-mapper",
+            "oidc-usermodel-property-mapper",
+            "saml-user-property-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-full-name-mapper"
           ]
         }
       },
@@ -2247,8 +2197,8 @@
   "attributes": {
     "cibaBackchannelTokenDeliveryMode": "poll",
     "cibaAuthRequestedUserHint": "login_hint",
-    "oauth2DevicePollingInterval": "5",
     "clientOfflineSessionMaxLifespan": "0",
+    "oauth2DevicePollingInterval": "5",
     "clientSessionIdleTimeout": "0",
     "clientOfflineSessionIdleTimeout": "0",
     "cibaInterval": "5",
