@@ -1,38 +1,35 @@
 server:
   port: 3000
 
-logging:
-  level:
-    org.springframework.security.kerberos: DEBUG
-
 spring:
   security:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: http://keycloak.auth-protocols.com:8080/realms/auth-protocols-oidc
-          jwk-set-uri: http://keycloak.auth-protocols.com:8080/realms/auth-protocols-oidc/protocol/openid-connect/certs
+          issuer-uri: ${app.keycloak-url}/realms/auth-protocols-oidc
+          jwk-set-uri: ${app.keycloak-url}/realms/auth-protocols-oidc/protocol/openid-connect/certs
   ldap:
-    urls: ldap://localhost:389
+    urls: ldap://openldap.auth-protocols.com:389
     base: dc=auth-protocols,dc=com
     username: cn=admin,dc=auth-protocols,dc=com
     password: adminpassword
 
 app:
+  keycloak-url: http://keycloak.auth-protocols.com:8080
   frontend-url: http://frontend.auth-protocols.com
+  backend-url: http://backend.auth-protocols.com:3000
   saml2:
-    success-url: http://frontend.auth-protocols.com
-    metadata-url: http://keycloak.auth-protocols.com:8080/realms/auth-protocols-saml2/protocol/saml/descriptor
-    acs-url: http://backend.auth-protocols.com:3000/api/saml2/acs
-    ars-url: http://keycloak.auth-protocols.com:8080/realms/auth-protocols-saml2/protocol/saml/resolve
-    slo-url: http://keycloak.auth-protocols.com:8080/realms/auth-protocols-saml2/protocol/saml
-    destination: http://keycloak.auth-protocols.com:8080/realms/auth-protocols-saml2/protocol/saml
-    issuer-id: http://backend.auth-protocols.com:3000/saml2/service-provider-metadata/keycloak
-    idp-issuer: http://keycloak.auth-protocols.com:8080/realms/auth-protocols-saml2
+    metadata-url: ${app.keycloak-url}/realms/auth-protocols-saml2/protocol/saml/descriptor
+    acs-url: ${app.backend-url}/api/saml2/acs
+    ars-url: ${app.keycloak-url}/realms/auth-protocols-saml2/protocol/saml/resolve
+    slo-url: ${app.keycloak-url}/realms/auth-protocols-saml2/protocol/saml
+    destination: ${app.keycloak-url}/realms/auth-protocols-saml2/protocol/saml
+    issuer-id: ${app.backend-url}/saml2/service-provider-metadata/keycloak
+    idp-issuer: ${app.keycloak-url}/realms/auth-protocols-saml2
   kerberos:
     spn: HTTP/desktop-a194p2n@AUTH-PROTOCOLS.COM
-    krb-conf-location: C:\Users\Kacper\Desktop\auth-protocols-parent\auth-protocols-backend\src\main\resources\kerberos\krb5.conf
-    keytab-location: C:\Users\Kacper\Desktop\auth-protocols-parent\auth-protocols-backend\src\main\resources\kerberos\krb5.keytab
+    krb-conf-location: /etc/krb5.conf
+    keytab-location: /etc/krb5.keytab
   jwt:
     access-token:
       secret: FDTSiQPw7hmwLufNzQ4zReJqqOhSCO6OHcVYPKRs1IjDLCWCVusspwiBsvAfSGbtSvxYTA6YsF11e5VI2RDJxw==

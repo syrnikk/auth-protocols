@@ -1,0 +1,105 @@
+version: '3.8'
+
+services:
+  kerberos:
+    build:
+      context: kerberos
+      args:
+        KERBEROS_DB_PASS: ${KERBEROS_DB_PASS}
+    ports:
+      - "88:88"
+      - "749:749"
+    hostname: kerberos
+    domainname: auth-protocols.com
+    volumes:
+      - kerberos-data:/var/kerberos/krb5kdc
+      - kerberos-keytabs:/etc/krb5/keytabs
+      - ./kerberos/init/init-script.sh:/etc/krb5/init/init-script.sh
+    networks:
+      - auth-protocols-network
+    command: /bin/bash -c "/etc/krb5/init/init-script.sh && krb5kdc -n"
+
+  postgres:
+    image: postgres:${POSTGRES_VERSION}
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    ports:
+      - '5432:5432'
+    hostname: postgres
+    domainname: auth-protocols.com
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+    networks:
+      - auth-protocols-network
+
+  keycloak:
+    image: quay.io/keycloak/keycloak:${KEYCLOAK_VERSION}
+    environment:
+      DB_VENDOR: postgres
+      DB_ADDR: postgres
+      DB_DATABASE: ${POSTGRES_DB}
+      DB_USER: ${POSTGRES_USER}
+      DB_PASSWORD: ${POSTGRES_PASSWORD}
+      KEYCLOAK_HOSTNAME: ${KEYCLOAK_HOSTNAME}
+      KEYCLOAK_ADMIN: ${KEYCLOAK_ADMIN}
+      KEYCLOAK_ADMIN_PASSWORD: ${KEYCLOAK_ADMIN_PASSWORD}
+    ports:
+      - '8080:8080'
+    command:
+      - start-dev --import-realm
+    depends_on:
+      - postgres
+    volumes:
+      - keycloak-data:/opt/keycloak/data
+      - "./keycloak/realms:/opt/keycloak/data/import"
+    hostname: keycloak
+    domainname: auth-protocols.com
+    networks:
+      - auth-protocols-network
+
+  openldap:
+    image: osixia/openldap:${LDAP_VERSION}
+    environment:
+      LDAP_ORGANISATION: ${LDAP_ORGANISATION}
+      LDAP_DOMAIN: ${LDAP_DOMAIN}
+      LDAP_ADMIN_PASSWORD: ${LDAP_ADMIN_PASSWORD}
+      LDAP_BASE_DN: ${LDAP_BASE_DN}
+    ports:
+      - "389:389"
+    volumes:
+      - ldap-data:/var/lib/ldap
+      - ldap-config:/etc/ldap/slapd.d
+      - ./openldap/ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom
+    hostname: openldap
+    domainname: auth-protocols.com
+    networks:
+      - auth-protocols-network
+    command: --copy-service
+
+  phpldapadmin:
+    image: osixia/phpldapadmin:${PHPLDAPADMIN_VERSION}
+    environment:
+      PHPLDAPADMIN_LDAP_HOSTS: openldap
+      PHPLDAPADMIN_HTTPS: 'false'
+    ports:
+      - "8081:80"
+    depends_on:
+      - openldap
+    hostname: phpldapadmin
+    domainname: auth-protocols.com
+    networks:
+      - auth-protocols-network
+
+networks:
+  auth-protocols-network:
+    driver: bridge
+
+volumes:
+  kerberos-data:
+  kerberos-keytabs:
+  postgres-data:
+  keycloak-data:
+  ldap-data:
+  ldap-config:
