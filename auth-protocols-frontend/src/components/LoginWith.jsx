@@ -8,22 +8,27 @@ import { useAuth } from "react-oidc-context";
 import { useRef } from "react";
 import { useNavigate } from "react-router-dom";
 import api from "../api/api";
+import { decodeToken } from "react-jwt";
+import { ActionType, useGlobalDispatch } from "./GlobalProvider";
+import Protocol from "../enums/Protocol";
 
 const LoginWith = ({ onShowLoading }) => {
   const oidc = useAuth();
   const samlLoginFormRef = useRef();
   const navigate = useNavigate();
+  const globalDispatch = useGlobalDispatch();
 
   const oidcLogin = () => {
     oidc.signinRedirect();
   };
 
   const samlLogin = async () => {
-    const response = await api.get('/api/saml2/create');
+    const response = await api.get("/api/saml2/create");
     const form = samlLoginFormRef.current;
     if (form) {
       form.action = response.data.samlIdpService;
-      form.querySelector('input[name="SAMLRequest"]').value = response.data.authnRequestEncoded;
+      form.querySelector('input[name="SAMLRequest"]').value =
+        response.data.authnRequestEncoded;
       form.submit();
       onShowLoading();
     }
@@ -35,12 +40,24 @@ const LoginWith = ({ onShowLoading }) => {
 
   const kerberosLogin = async () => {
     try {
-      const response = await api.get("/api/kerberos");
-      console.log(response)
+      const response = await api.post("/api/kerberos/authenticate");
+      const { accessToken, refreshToken } = response.data;
+      const decodedToken = decodeToken(accessToken);
+      globalDispatch({
+        type: ActionType.LOGIN,
+        accessToken: accessToken,
+        refreshToken: refreshToken,
+        protocol: Protocol.KERBEROS,
+        user: {
+          username: decodedToken.sub,
+          authorities: decodedToken.authorities,
+        },
+      });
     } catch (error) {
       console.log(error);
     }
-  }
+    navigate("/");
+  };
 
   return (
     <Box
@@ -71,9 +88,7 @@ const LoginWith = ({ onShowLoading }) => {
         </Grid>
         <Grid item>
           <AuthCard imageSrc={samlLogo} text="SAML 2.0" onClick={samlLogin} />
-          <form
-            ref={samlLoginFormRef}
-            method="post">
+          <form ref={samlLoginFormRef} method="post">
             <input type="hidden" name="SAMLRequest" />
           </form>
         </Grid>
@@ -81,7 +96,11 @@ const LoginWith = ({ onShowLoading }) => {
           <AuthCard imageSrc={ldapLogo} text="LDAP" onClick={ldapLogin} />
         </Grid>
         <Grid item>
-          <AuthCard imageSrc={kerberosLogo} text="Kerberos" onClick={kerberosLogin} />
+          <AuthCard
+            imageSrc={kerberosLogo}
+            text="Kerberos"
+            onClick={kerberosLogin}
+          />
         </Grid>
       </Grid>
     </Box>

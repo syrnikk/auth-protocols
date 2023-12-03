@@ -1,6 +1,17 @@
 version: '3.8'
 
 services:
+  backend:
+    build: auth-protocols-backend
+    hostname: backend
+    domainname: auth-protocols.com
+    ports:
+      - "3000:3000"
+    volumes:
+      - kerberos-keytabs:/etc/krb5/keytabs
+    networks:
+      - auth-protocols-network
+
   kerberos:
     build:
       context: kerberos

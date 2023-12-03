@@ -16,7 +16,7 @@ spring:
 
 app:
   keycloak-url: http://keycloak.auth-protocols.com:8080
-  frontend-url: http://frontend.auth-protocols.com
+  frontend-url: http://localhost:5173
   backend-url: http://backend.auth-protocols.com:3000
   saml2:
     metadata-url: ${app.keycloak-url}/realms/auth-protocols-saml2/protocol/saml/descriptor
@@ -29,7 +29,7 @@ app:
   kerberos:
     spn: HTTP/desktop-a194p2n@AUTH-PROTOCOLS.COM
     krb-conf-location: /etc/krb5.conf
-    keytab-location: /etc/krb5.keytab
+    keytab-location: /etc/krb5/keytabs/krb5.keytab
   jwt:
     access-token:
       secret: FDTSiQPw7hmwLufNzQ4zReJqqOhSCO6OHcVYPKRs1IjDLCWCVusspwiBsvAfSGbtSvxYTA6YsF11e5VI2RDJxw==

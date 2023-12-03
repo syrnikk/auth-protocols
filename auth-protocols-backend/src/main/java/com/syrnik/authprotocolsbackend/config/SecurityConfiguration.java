@@ -1,6 +1,6 @@
 package com.syrnik.authprotocolsbackend.config;
 
-import java.util.Collections;
+import java.util.Set;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -14,6 +14,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.config.ldap.LdapBindAuthenticationManagerFactory;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.kerberos.authentication.KerberosServiceAuthenticationProvider;
@@ -32,6 +33,7 @@ import com.syrnik.authprotocolsbackend.security.jwt.JwtTokenFilter;
 import com.syrnik.authprotocolsbackend.security.ldap.LdapAuthenticationSuccessHandler;
 import com.syrnik.authprotocolsbackend.security.oidc.OidcJwtConverter;
 import com.syrnik.authprotocolsbackend.security.oidc.OidcBearerTokenResolver;
+
 import lombok.RequiredArgsConstructor;
 
 @Configuration
@@ -58,9 +60,7 @@ public class SecurityConfiguration {
         http
               .securityMatcher("/api/kerberos/**")
               .csrf(AbstractHttpConfigurer::disable)
-              .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/kerberos/**").authenticated()
-              )
+              .authorizeHttpRequests(auth -> auth.requestMatchers("/api/kerberos/**").authenticated())
               .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
               .exceptionHandling(exception -> exception.authenticationEntryPoint(spnegoEntryPoint()))
               .addFilterBefore(spnegoAuthenticationProcessingFilter(), BasicAuthenticationFilter.class);
@@ -95,14 +95,14 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    LdapAuthoritiesPopulator authorities(BaseLdapPathContextSource contextSource) {
+    public LdapAuthoritiesPopulator authorities(BaseLdapPathContextSource contextSource) {
         DefaultLdapAuthoritiesPopulator authorities = new DefaultLdapAuthoritiesPopulator(contextSource, "ou=groups");
         authorities.setGroupSearchFilter("(member={0})");
         return authorities;
     }
 
     @Bean
-    AuthenticationManager authenticationManager(BaseLdapPathContextSource contextSource) {
+    public AuthenticationManager authenticationManager(BaseLdapPathContextSource contextSource) {
         LdapBindAuthenticationManagerFactory factory = new LdapBindAuthenticationManagerFactory(contextSource);
         factory.setUserSearchBase("ou=users");
         factory.setUserSearchFilter("(uid={0})");
@@ -143,7 +143,7 @@ public class SecurityConfiguration {
     }
 
     public UserDetailsService kerberosUserDetailsService() {
-        return username -> new User(username, "", Collections.emptyList());
+        return username -> new User(username, "", Set.of(new SimpleGrantedAuthority("ROLE_USER")));
     }
 
     public AuthenticationManager spnegoAuthenticationManager() {

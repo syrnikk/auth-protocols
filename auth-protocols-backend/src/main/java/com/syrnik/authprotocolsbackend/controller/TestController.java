@@ -21,9 +21,4 @@ public class TestController {
     public ResponseEntity<?> privateExample() {
         return ResponseEntity.ok().build();
     }
-
-    @GetMapping("/kerberos")
-    public ResponseEntity<?> kerberos() {
-        return ResponseEntity.ok("OK");
-    }
 }
