@@ -4,11 +4,25 @@ services:
   backend:
     build: auth-protocols-backend
     hostname: backend
-    domainname: auth-protocols.com
     ports:
       - "3000:3000"
     volumes:
       - kerberos-keytabs:/etc/krb5/keytabs
+    networks:
+      - auth-protocols-network
+
+  frontend:
+    build: 
+      context: auth-protocols-frontend
+      args:
+        VITE_API_URL: ${VITE_API_URL}
+        VITE_OIDC_AUTHORITY: ${VITE_OIDC_AUTHORITY}
+        VITE_OIDC_CLIENT_ID: ${VITE_OIDC_CLIENT_ID}
+        VITE_OIDC_REDIRECT_URI: ${VITE_OIDC_REDIRECT_URI}
+        VITE_OIDC_POST_LOGOUT_REDIRECT_URI: ${VITE_OIDC_POST_LOGOUT_REDIRECT_URI}
+    hostname: frontend
+    ports:
+      - "80:80"
     networks:
       - auth-protocols-network
 
@@ -21,7 +35,6 @@ services:
       - "88:88"
       - "749:749"
     hostname: kerberos
-    domainname: auth-protocols.com
     volumes:
       - kerberos-data:/var/kerberos/krb5kdc
       - kerberos-keytabs:/etc/krb5/keytabs
@@ -39,7 +52,6 @@ services:
     ports:
       - '5432:5432'
     hostname: postgres
-    domainname: auth-protocols.com
     volumes:
       - postgres-data:/var/lib/postgresql/data
     networks:
@@ -66,7 +78,6 @@ services:
       - keycloak-data:/opt/keycloak/data
       - "./keycloak/realms:/opt/keycloak/data/import"
     hostname: keycloak
-    domainname: auth-protocols.com
     networks:
       - auth-protocols-network
 
@@ -84,7 +95,6 @@ services:
       - ldap-config:/etc/ldap/slapd.d
       - ./openldap/ldif:/container/service/slapd/assets/config/bootstrap/ldif/custom
     hostname: openldap
-    domainname: auth-protocols.com
     networks:
       - auth-protocols-network
     command: --copy-service
@@ -99,7 +109,6 @@ services:
     depends_on:
       - openldap
     hostname: phpldapadmin
-    domainname: auth-protocols.com
     networks:
       - auth-protocols-network
 

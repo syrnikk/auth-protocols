@@ -9,15 +9,15 @@ spring:
           issuer-uri: ${app.keycloak-url}/realms/auth-protocols-oidc
           jwk-set-uri: ${app.keycloak-url}/realms/auth-protocols-oidc/protocol/openid-connect/certs
   ldap:
-    urls: ldap://openldap.auth-protocols.com:389
+    urls: ldap://openldap:389
     base: dc=auth-protocols,dc=com
     username: cn=admin,dc=auth-protocols,dc=com
     password: adminpassword
 
 app:
-  keycloak-url: http://keycloak.auth-protocols.com:8080
-  frontend-url: http://localhost:5173
-  backend-url: http://backend.auth-protocols.com:3000
+  keycloak-url: http://keycloak:8080
+  frontend-url: http://localhost
+  backend-url: http://backend:3000
   saml2:
     metadata-url: ${app.keycloak-url}/realms/auth-protocols-saml2/protocol/saml/descriptor
     acs-url: ${app.backend-url}/api/saml2/acs

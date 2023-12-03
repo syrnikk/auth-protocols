@@ -316,7 +316,10 @@
           "attributes": {}
         }
       ],
-      "http://backend.auth-protocols.com:3000/saml2/service-provider-metadata/keycloak": [
+      "security-admin-console": [],
+      "admin-cli": [],
+      "account-console": [],
+      "http://backend:3000/saml2/service-provider-metadata/keycloak": [
         {
           "id": "3e1f9e86-9dbf-4b48-a4ce-fd44f7a1d081",
           "name": "admin",
@@ -336,9 +339,6 @@
           "attributes": {}
         }
       ],
-      "security-admin-console": [],
-      "admin-cli": [],
-      "account-console": [],
       "broker": [
         {
           "id": "125d242e-5f5a-4d7c-8f10-d2a81bc036d9",
@@ -461,8 +461,8 @@
   "otpPolicyCodeReusable": false,
   "otpSupportedApplications": [
     "totpAppGoogleName",
-    "totpAppFreeOTPName",
-    "totpAppMicrosoftAuthenticatorName"
+    "totpAppMicrosoftAuthenticatorName",
+    "totpAppFreeOTPName"
   ],
   "webAuthnPolicyRpEntityName": "keycloak",
   "webAuthnPolicySignatureAlgorithms": [
@@ -689,12 +689,12 @@
     },
     {
       "id": "55cad098-b757-40c8-8054-b8e556cb56c5",
-      "clientId": "http://backend.auth-protocols.com:3000/saml2/service-provider-metadata/keycloak",
+      "clientId": "http://backend:3000/saml2/service-provider-metadata/keycloak",
       "name": "",
       "description": "",
-      "rootUrl": "http://backend.auth-protocols.com:3000/",
+      "rootUrl": "http://backend:3000/",
       "adminUrl": "",
-      "baseUrl": "http://backend.auth-protocols.com:3000/",
+      "baseUrl": "http://backend:3000/",
       "surrogateAuthRequired": false,
       "enabled": true,
       "alwaysDisplayInConsole": false,
@@ -1438,14 +1438,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-address-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "oidc-usermodel-attribute-mapper",
             "saml-user-property-mapper",
-            "saml-user-attribute-mapper",
+            "saml-role-list-mapper",
             "oidc-full-name-mapper",
+            "oidc-address-mapper",
+            "saml-user-attribute-mapper",
             "oidc-usermodel-property-mapper",
-            "saml-role-list-mapper"
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-usermodel-attribute-mapper"
           ]
         }
       },
@@ -1469,14 +1469,14 @@
         "subComponents": {},
         "config": {
           "allowed-protocol-mapper-types": [
-            "oidc-usermodel-attribute-mapper",
-            "oidc-usermodel-property-mapper",
-            "saml-user-property-mapper",
-            "oidc-sha256-pairwise-sub-mapper",
-            "saml-role-list-mapper",
-            "oidc-address-mapper",
             "saml-user-attribute-mapper",
-            "oidc-full-name-mapper"
+            "saml-user-property-mapper",
+            "oidc-address-mapper",
+            "saml-role-list-mapper",
+            "oidc-sha256-pairwise-sub-mapper",
+            "oidc-full-name-mapper",
+            "oidc-usermodel-attribute-mapper",
+            "oidc-usermodel-property-mapper"
           ]
         }
       },

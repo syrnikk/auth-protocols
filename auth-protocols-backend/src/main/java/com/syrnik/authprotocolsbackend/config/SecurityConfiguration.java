@@ -72,11 +72,7 @@ public class SecurityConfiguration {
         return http
               .csrf(AbstractHttpConfigurer::disable)
               .authorizeHttpRequests(auth -> auth
-                    .requestMatchers("/api/public/**")
-                    .permitAll()
-                    .requestMatchers("/api/saml2/**")
-                    .permitAll()
-                    .requestMatchers("/api/auth/**")
+                    .requestMatchers("/api/public/**", "/api/saml2/**", "/api/auth/**")
                     .permitAll()
                     .anyRequest()
                     .authenticated())
