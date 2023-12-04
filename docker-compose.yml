@@ -31,6 +31,8 @@ services:
       context: kerberos
       args:
         KERBEROS_DB_PASS: ${KERBEROS_DB_PASS}
+    environment:
+      KERBEROS_SPN: ${KERBEROS_SPN}
     ports:
       - "88:88"
       - "749:749"
