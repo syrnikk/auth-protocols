@@ -27,11 +27,14 @@ const Login = () => {
         accessToken: accessToken,
         refreshToken: refreshToken,
         protocol: Protocol.LDAP,
-        user:{
+        user: {
           username: decodedToken.sub,
-          authorities: decodedToken.authorities
-        }
-      })
+          email: decodedToken.email,
+          firstName: decodedToken.first_name,
+          lastName: decodedToken.last_name,
+          authorities: decodedToken.authorities,
+        },
+      });
     } catch (error) {
       console.log(error);
     }

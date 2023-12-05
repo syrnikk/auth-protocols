@@ -28,6 +28,9 @@ const Saml2ArtifactHandler = () => {
             protocol: Protocol.SAML2,
             user:{
               username: decodedToken.sub,
+              email: decodedToken.email,
+              firstName: decodedToken.first_name,
+              lastName: decodedToken.last_name,
               authorities: decodedToken.authorities
             }
           })

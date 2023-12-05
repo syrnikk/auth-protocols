@@ -2,9 +2,11 @@ import { useState } from "react";
 import { IconButton, Menu, MenuItem } from "@mui/material";
 import { AccountCircle } from "@mui/icons-material";
 import Logout from "./Logout";
+import { useNavigate } from "react-router-dom";
 
 const UserProfileMenu = () => {
   const [anchorEl, setAnchorEl] = useState(null);
+  const navigate = useNavigate();
 
   const handleMenu = (event) => {
     setAnchorEl(event.currentTarget);
@@ -41,8 +43,14 @@ const UserProfileMenu = () => {
         open={Boolean(anchorEl)}
         onClose={handleClose}
       >
-        <MenuItem onClick={handleClose}>Profile</MenuItem>
-        <MenuItem onClick={handleClose}>My account</MenuItem>
+        <MenuItem
+          onClick={() => {
+            navigate("/account");
+            handleClose();
+          }}
+        >
+          My account
+        </MenuItem>
         <Logout />
       </Menu>
     </div>

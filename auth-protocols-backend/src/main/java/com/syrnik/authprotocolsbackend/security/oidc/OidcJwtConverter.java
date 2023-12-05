@@ -50,7 +50,10 @@ public class OidcJwtConverter implements Converter<Jwt, AbstractAuthenticationTo
         if(roles == null) {
             return Collections.emptyList();
         }
-        return roles.stream().map(role -> new SimpleGrantedAuthority(ROLE_PREFIX + role)).collect(Collectors.toSet());
+        return roles
+              .stream()
+              .map(role -> new SimpleGrantedAuthority(ROLE_PREFIX + role.toUpperCase()))
+              .collect(Collectors.toSet());
     }
 
     private String getPrincipleName(Jwt jwt) {

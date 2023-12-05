@@ -1,10 +1,21 @@
 package com.syrnik.authprotocolsbackend.security.jwt;
 
+import static com.syrnik.authprotocolsbackend.security.jwt.JwtClaims.AUTHORITIES;
+import static com.syrnik.authprotocolsbackend.security.jwt.JwtClaims.EMAIL;
+import static com.syrnik.authprotocolsbackend.security.jwt.JwtClaims.FIRST_NAME;
+import static com.syrnik.authprotocolsbackend.security.jwt.JwtClaims.LAST_NAME;
+
 import java.util.Date;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Component;
+
+import com.syrnik.authprotocolsbackend.security.CustomUserDetails;
 
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.ExpiredJwtException;
@@ -19,6 +30,8 @@ import lombok.extern.slf4j.Slf4j;
 @Slf4j
 @Component
 public class JwtTokenProvider {
+
+    private static final String ROLE_PREFIX = "ROLE_";
 
     @Value("${app.jwt.access-token.secret}")
     private String jwtAccessTokenSecret;
@@ -55,7 +68,20 @@ public class JwtTokenProvider {
 
     public Authentication getAuthentication(String accessToken) {
         Claims claims = extractAccessTokenClaims(accessToken);
-        return new UsernamePasswordAuthenticationToken(claims.getSubject(), "", null);
+
+        String email = (String) claims.get(EMAIL);
+        String firstName = (String) claims.get(FIRST_NAME);
+        String lastName = (String) claims.get(LAST_NAME);
+        List<String> authorities = (List<String>) claims.get(AUTHORITIES);
+        Set<SimpleGrantedAuthority> grantedAuthorities = authorities
+              .stream()
+              .map(authority -> authority.startsWith(ROLE_PREFIX) ? new SimpleGrantedAuthority(authority) :
+                                new SimpleGrantedAuthority(ROLE_PREFIX + authority.toUpperCase()))
+              .collect(Collectors.toUnmodifiableSet());
+
+        CustomUserDetails userDetails = new CustomUserDetails(claims.getSubject(), "", email, firstName, lastName,
+              grantedAuthorities);
+        return new UsernamePasswordAuthenticationToken(userDetails, "", grantedAuthorities);
     }
 
     public String resolveToken(HttpServletRequest req) {

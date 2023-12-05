@@ -1,8 +1,14 @@
-dn: ou=users,dc=auth-protocols,dc=com
+dn: ou=groups,dc=auth-protocols,dc=com
+objectClass: top
 objectClass: organizationalUnit
-ou: users
+ou: groups
 
-dn: uid=johndoe-ldap,ou=users,dc=auth-protocols,dc=com
+dn: ou=people,dc=auth-protocols,dc=com
+objectClass: top
+objectClass: organizationalUnit
+ou: people
+
+dn: uid=johndoe-ldap,ou=people,dc=auth-protocols,dc=com
 objectClass: top
 objectClass: person
 objectClass: organizationalPerson
@@ -11,5 +17,12 @@ uid: johndoe-ldap
 cn: John Doe
 sn: Doe
 givenName: John
-mail: john.doe@example.com
+mail: john.doe@mail.com
 userPassword: password
+memberOf: cn=user,ou=groups,dc=auth-protocols,dc=com
+
+dn: cn=user,ou=groups,dc=auth-protocols,dc=com
+objectClass: top
+objectClass: groupOfNames
+cn: user
+member: uid=johndoe-ldap,ou=people,dc=auth-protocols,dc=com

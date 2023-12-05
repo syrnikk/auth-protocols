@@ -24,6 +24,7 @@ import org.springframework.security.kerberos.web.authentication.SpnegoAuthentica
 import org.springframework.security.kerberos.web.authentication.SpnegoEntryPoint;
 import org.springframework.security.ldap.userdetails.DefaultLdapAuthoritiesPopulator;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
+import org.springframework.security.ldap.userdetails.LdapUserDetailsMapper;
 import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.AuthenticationEntryPointFailureHandler;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
@@ -91,16 +92,19 @@ public class SecurityConfiguration {
     }
 
     @Bean
-    public LdapAuthoritiesPopulator authorities(BaseLdapPathContextSource contextSource) {
+    public LdapAuthoritiesPopulator ldapAuthoritiesPopulator(BaseLdapPathContextSource contextSource) {
         DefaultLdapAuthoritiesPopulator authorities = new DefaultLdapAuthoritiesPopulator(contextSource, "ou=groups");
         authorities.setGroupSearchFilter("(member={0})");
         return authorities;
     }
 
     @Bean
-    public AuthenticationManager authenticationManager(BaseLdapPathContextSource contextSource) {
+    public AuthenticationManager authenticationManager(BaseLdapPathContextSource contextSource,
+          LdapUserDetailsMapper ldapUserDetailsMapper, LdapAuthoritiesPopulator ldapAuthoritiesPopulator) {
         LdapBindAuthenticationManagerFactory factory = new LdapBindAuthenticationManagerFactory(contextSource);
-        factory.setUserSearchBase("ou=users");
+        factory.setUserDetailsContextMapper(ldapUserDetailsMapper);
+        factory.setLdapAuthoritiesPopulator(ldapAuthoritiesPopulator);
+        factory.setUserSearchBase("ou=people");
         factory.setUserSearchFilter("(uid={0})");
         return factory.createAuthenticationManager();
     }

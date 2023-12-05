@@ -9,12 +9,12 @@ import Error from "./components/Error";
 import Login from "./components/Login";
 import Saml2ArtifactHandler from "./components/Saml2ArtifactHandler";
 import { ActionType, useGlobalDispatch } from "./components/GlobalProvider";
+import Account from "./components/Account";
 
 function App() {
   const [isLoading, setIsLoading] = useState(false);
   const oidc = useAuth();
   const globalDispatch = useGlobalDispatch();
-  console.log(oidc.user)
 
   useEffect(() => {
     globalDispatch({
@@ -52,6 +52,7 @@ function App() {
             element={<LoginWith onShowLoading={showLoading} />}
           />
           <Route path="/login" element={<Login />} />
+          <Route path="/account" element={<Account />} />
           <Route path="/saml2" element={<Saml2ArtifactHandler />} />
         </Routes>
       </BrowserRouter>

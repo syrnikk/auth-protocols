@@ -22,9 +22,23 @@ const useGlobalAuth = () => {
     return globalState.protocol;
   }
 
+  const getUser = () => {
+    if(oidc.isAuthenticated) {
+      const profile = oidc.user.profile;
+      return {
+        username: profile.preferred_username,
+        firstName: profile.given_name,
+        lastName: profile.family_name,
+        email: profile.email
+      }
+    }
+    return globalState.user;
+  }
+
   return {
     isAuthenticated: isAuthenticated,
     getProtocol: getProtocol,
+    getUser: getUser,
   };
 };
 

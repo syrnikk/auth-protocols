@@ -1,5 +1,10 @@
 package com.syrnik.authprotocolsbackend.security.saml2;
 
+import static com.syrnik.authprotocolsbackend.security.saml2.AttributeName.EMAIL_ATTRIBUTE_NAME;
+import static com.syrnik.authprotocolsbackend.security.saml2.AttributeName.FIRST_NAME_ATTRIBUTE_NAME;
+import static com.syrnik.authprotocolsbackend.security.saml2.AttributeName.LAST_NAME_ATTRIBUTE_NAME;
+import static com.syrnik.authprotocolsbackend.security.saml2.AttributeName.ROLE_ATTRIBUTE_NAME;
+
 import java.io.ByteArrayInputStream;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -8,6 +13,7 @@ import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.time.Instant;
 import java.util.Base64;
+import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 import java.util.stream.Collectors;
@@ -62,7 +68,6 @@ import net.shibboleth.utilities.java.support.httpclient.HttpClientBuilder;
 import net.shibboleth.utilities.java.support.xml.BasicParserPool;
 
 public class Saml2Util {
-    private static final String ROLE_ATTRIBUTE_NAME = "Role";
 
     public static String xmlObjectToString(XMLObject xmlObject) throws TransformerException, MarshallingException {
         Element element = marshalToElement(xmlObject);
@@ -132,7 +137,8 @@ public class Saml2Util {
         SignatureSigningParameters signatureSigningParameters = new SignatureSigningParameters();
         signatureSigningParameters.setSigningCredential(getSigningCredential());
         signatureSigningParameters.setSignatureAlgorithm(SignatureConstants.ALGO_ID_SIGNATURE_RSA_SHA256);
-        signatureSigningParameters.setSignatureCanonicalizationAlgorithm(SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
+        signatureSigningParameters.setSignatureCanonicalizationAlgorithm(
+              SignatureConstants.ALGO_ID_C14N_EXCL_OMIT_COMMENTS);
         return signatureSigningParameters;
     }
 
@@ -164,7 +170,12 @@ public class Saml2Util {
                   return null;
               })
               .collect(Collectors.toSet());
-        return new AssertionData(nameID, sessionIndex, authorities);
+        Map<String, String> userInfo = Map.of(
+              EMAIL_ATTRIBUTE_NAME, getSingleAttributeValue(EMAIL_ATTRIBUTE_NAME, assertion),
+              FIRST_NAME_ATTRIBUTE_NAME, getSingleAttributeValue(FIRST_NAME_ATTRIBUTE_NAME, assertion),
+              LAST_NAME_ATTRIBUTE_NAME, getSingleAttributeValue(LAST_NAME_ATTRIBUTE_NAME, assertion)
+        );
+        return new AssertionData(nameID, sessionIndex, authorities, userInfo);
     }
 
     public static Issuer buildIssuer(String issuerId) {
@@ -238,5 +249,22 @@ public class Saml2Util {
               new ByteArrayInputStream(decodedCert));
 
         return certificate;
+    }
+
+    private static String getSingleAttributeValue(String attributeName, Assertion assertion) {
+        return assertion
+              .getAttributeStatements()
+              .getFirst()
+              .getAttributes()
+              .stream()
+              .filter(attribute -> attribute.getName().equals(attributeName))
+              .map(attribute -> {
+                  if(attribute.getAttributeValues().getFirst() instanceof XSString stringAttribute) {
+                      return stringAttribute.getValue();
+                  }
+                  return null;
+              })
+              .findFirst()
+              .orElse(null);
     }
 }

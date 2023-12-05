@@ -1,9 +1,16 @@
 package com.syrnik.authprotocolsbackend.controller;
 
 import static com.syrnik.authprotocolsbackend.security.jwt.JwtClaims.AUTHORITIES;
+import static com.syrnik.authprotocolsbackend.security.jwt.JwtClaims.EMAIL;
+import static com.syrnik.authprotocolsbackend.security.jwt.JwtClaims.FIRST_NAME;
+import static com.syrnik.authprotocolsbackend.security.jwt.JwtClaims.LAST_NAME;
 import static com.syrnik.authprotocolsbackend.security.jwt.JwtClaims.PROTOCOL;
 import static com.syrnik.authprotocolsbackend.security.jwt.JwtClaims.SESSION_INDEX;
+import static com.syrnik.authprotocolsbackend.security.saml2.AttributeName.EMAIL_ATTRIBUTE_NAME;
+import static com.syrnik.authprotocolsbackend.security.saml2.AttributeName.FIRST_NAME_ATTRIBUTE_NAME;
+import static com.syrnik.authprotocolsbackend.security.saml2.AttributeName.LAST_NAME_ATTRIBUTE_NAME;
 
+import java.util.Map;
 import org.opensaml.saml.saml2.core.LogoutRequest;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
@@ -63,12 +70,16 @@ public class Saml2Controller {
     @PostMapping("/saml2/authenticate")
     public ResponseEntity<JwtResponse> saml2Authenticate(@RequestBody SamlArtRequest samlArtRequest) throws Exception {
         AssertionData assertionData = saml2Service.getAssertionData(samlArtRequest.samlArt());
+        Map<String, String> userInfo = assertionData.userInfo();
         Claims claims = Jwts
               .claims()
               .subject(assertionData.nameID())
               .add(AUTHORITIES, assertionData.authorities())
               .add(PROTOCOL, AuthProtocol.SAML2)
               .add(SESSION_INDEX, assertionData.sessionIndex())
+              .add(EMAIL, userInfo.get(EMAIL_ATTRIBUTE_NAME))
+              .add(FIRST_NAME, userInfo.get(FIRST_NAME_ATTRIBUTE_NAME))
+              .add(LAST_NAME, userInfo.get(LAST_NAME_ATTRIBUTE_NAME))
               .build();
         String accessToken = jwtTokenProvider.generateAccessToken(claims);
         String refreshToken = jwtTokenProvider.generateRefreshToken(claims);
