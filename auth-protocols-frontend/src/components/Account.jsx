@@ -23,38 +23,52 @@ const Account = () => {
         <Typography component="h1" variant="h5" sx={{ mb: 2, mt: 3 }}>
           Account Information
         </Typography>
-        <Grid container spacing={2} alignItems="center" sx={{paddingX: 10}}>
-          <Grid item xs={5} sx={{ textAlign: "right" }}>
-            <Typography variant="body1">Login:</Typography>
-          </Grid>
-          <Grid item xs={7}>
-            <Typography variant="body1">{user.username}</Typography>
-          </Grid>
-          <Grid item xs={5} sx={{ textAlign: "right" }}>
-            <Typography variant="body1">First Name:</Typography>
-          </Grid>
-          <Grid item xs={7}>
-            <Typography variant="body1">{user.firstName}</Typography>
-          </Grid>
-          <Grid item xs={5} sx={{ textAlign: "right" }}>
-            <Typography variant="body1">Last Name:</Typography>
-          </Grid>
-          <Grid item xs={7}>
-            <Typography variant="body1">{user.lastName}</Typography>
-          </Grid>
-          <Grid item xs={5} sx={{ textAlign: "right" }}>
-            <Typography variant="body1">Email:</Typography>
-          </Grid>
-          <Grid item xs={7}>
-            <Typography variant="body1">{user.email}</Typography>
-          </Grid>
+        <Grid container spacing={2} alignItems="center" sx={{ paddingX: 10 }}>
+          {user.username && (
+            <>
+              <Grid item xs={5} sx={{ textAlign: "right" }}>
+                <Typography variant="body1">Login:</Typography>
+              </Grid>
+              <Grid item xs={7}>
+                <Typography variant="body1">{user.username}</Typography>
+              </Grid>
+            </>
+          )}
+          {user.firstName && (
+            <>
+              <Grid item xs={5} sx={{ textAlign: "right" }}>
+                <Typography variant="body1">First Name:</Typography>
+              </Grid>
+              <Grid item xs={7}>
+                <Typography variant="body1">{user.firstName}</Typography>
+              </Grid>
+            </>
+          )}
+          {user.lastName && (
+            <>
+              <Grid item xs={5} sx={{ textAlign: "right" }}>
+                <Typography variant="body1">Last Name:</Typography>
+              </Grid>
+              <Grid item xs={7}>
+                <Typography variant="body1">{user.lastName}</Typography>
+              </Grid>
+            </>
+          )}
+          {user.email && (
+            <>
+              <Grid item xs={5} sx={{ textAlign: "right" }}>
+                <Typography variant="body1">Email:</Typography>
+              </Grid>
+              <Grid item xs={7}>
+                <Typography variant="body1">{user.email}</Typography>
+              </Grid>
+            </>
+          )}
           <Grid item xs={5} sx={{ textAlign: "right" }}>
             <Typography variant="body1">Authentication Protocol:</Typography>
           </Grid>
           <Grid item xs={7}>
-            <Typography variant="body1">
-              {globalAuth.getProtocol()}
-            </Typography>
+            <Typography variant="body1">{globalAuth.getProtocol()}</Typography>
           </Grid>
         </Grid>
       </Box>
