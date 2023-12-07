@@ -100,19 +100,21 @@ services:
     networks:
       - auth-protocols-network
     command: --copy-service
-
-  phpldapadmin:
-    image: osixia/phpldapadmin:${PHPLDAPADMIN_VERSION}
-    environment:
-      PHPLDAPADMIN_LDAP_HOSTS: openldap
-      PHPLDAPADMIN_HTTPS: 'false'
-    ports:
-      - "8081:80"
-    depends_on:
-      - openldap
-    hostname: phpldapadmin
-    networks:
-      - auth-protocols-network
+  
+  # OPTIONAL - for openldap administration
+  # 
+  # phpldapadmin:
+  #   image: osixia/phpldapadmin:${PHPLDAPADMIN_VERSION}
+  #   environment:
+  #     PHPLDAPADMIN_LDAP_HOSTS: openldap
+  #     PHPLDAPADMIN_HTTPS: 'false'
+  #   ports:
+  #     - "8081:80"
+  #   depends_on:
+  #     - openldap
+  #   hostname: phpldapadmin
+  #   networks:
+  #     - auth-protocols-network
 
 networks:
   auth-protocols-network:
