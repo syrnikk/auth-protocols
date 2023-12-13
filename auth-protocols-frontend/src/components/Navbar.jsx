@@ -31,6 +31,8 @@ const Navbar = () => {
     setAnchorElNav(null);
   };
 
+  const user = globalAuth.getUser();
+
   return (
     <AppBar position="static">
       <Container maxWidth="xl">
@@ -128,7 +130,16 @@ const Navbar = () => {
             ))}
           </Box>
           {globalAuth.isAuthenticated() ? (
+            <>
+            <Typography
+              variant="h6"
+              noWrap
+              sx={{ mx: 2, color: "white", display: "block" }}
+            >
+              {user.username}
+            </Typography>
             <UserProfileMenu />
+          </>
           ) : (
             <Button
               key="login"
