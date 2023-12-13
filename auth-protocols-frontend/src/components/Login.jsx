@@ -10,14 +10,23 @@ import { useNavigate } from "react-router-dom";
 import { decodeToken } from "react-jwt";
 import Protocol from "../enums/Protocol";
 import { ActionType, useGlobalDispatch } from "./GlobalProvider";
+import { useRef, useState } from "react";
 
 const Login = () => {
   const navigate = useNavigate();
   const globalDispatch = useGlobalDispatch();
-
+  const usernameRef = useRef(null);
+  const passwordRef = useRef(null);
+  const [errorMessage, setErrorMessage] = useState("");
   const handleSubmit = async (event) => {
+    console.log(passwordRef.current.value === undefined)
+    console.log(passwordRef.current.value === null)
+    console.log(passwordRef.current.value === '')
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
+    setErrorMessage("");
+    const data = new FormData();
+    data.append("username", usernameRef.current.value);
+    data.append("password", passwordRef.current.value);
     try {
       const response = await api.post("/api/login", data);
       const { accessToken, refreshToken } = response.data;
@@ -35,10 +44,15 @@ const Login = () => {
           authorities: decodedToken.authorities,
         },
       });
+      navigate("/");
     } catch (error) {
-      console.log(error);
+      if (error.response && error.response.status === 401) {
+        setErrorMessage("Invalid username or password!");
+      } else {
+        console.log(error);
+      }
     }
-    navigate("/");
+    passwordRef.current.value = '';
   };
 
   return (
@@ -64,6 +78,7 @@ const Login = () => {
             name="username"
             autoComplete="username"
             autoFocus
+            inputRef={usernameRef}
           />
           <TextField
             margin="normal"
@@ -71,9 +86,11 @@ const Login = () => {
             fullWidth
             name="password"
             label="Password"
+            placeholder="Password *"
             type="password"
             id="password"
             autoComplete="current-password"
+            inputRef={passwordRef}
           />
           <Button
             type="submit"
@@ -83,6 +100,11 @@ const Login = () => {
           >
             Sign In
           </Button>
+          {errorMessage && (
+            <Typography color="error" sx={{ mb: 2 }}>
+              {errorMessage}
+            </Typography>
+          )}
           <Grid container>
             <Grid item xs>
               <Link href="#" variant="body2">
